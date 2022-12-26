@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    
+
+    
+    <title>Hexo Hueman Theme 블로그 - 파싱할 수 없는 구조화된 데이터 | Rhyno Tech Blog</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="SEO,Google Search Console,Blog,구조화된 데이터,Semantic Web,structure data,Schema.org,JSON-LD,검색엔진최적화" />
+    
+    <meta name="description" content="Hexo Hueman 테마를 사용하여 개발자 블로그를 운영중이다. 그런데 새로 작성한 글들이 구글에서 조회가 되지 않는 것이다.처음에는 크롤링을 하지 않아서 그런 것이겠지 했는데, 몇일이 지나도 계속 조회가 되지 않았다.이번 글은 Google Search Console을 통해서 구글에서 작성한 글이 검색되도록 한 과정과 용어들을 공유하겠다.  Google">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo Hueman Theme 블로그 - 파싱할 수 없는 구조화된 데이터">
+<meta property="og:url" content="http://gregor77.github.io/2019/08/19/hexo-hueman-unparsed-structured-data/index.html">
+<meta property="og:site_name" content="Rhyno Tech Blog">
+<meta property="og:description" content="Hexo Hueman 테마를 사용하여 개발자 블로그를 운영중이다. 그런데 새로 작성한 글들이 구글에서 조회가 되지 않는 것이다.처음에는 크롤링을 하지 않아서 그런 것이겠지 했는데, 몇일이 지나도 계속 조회가 되지 않았다.이번 글은 Google Search Console을 통해서 구글에서 작성한 글이 검색되도록 한 과정과 용어들을 공유하겠다.  Google">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://gregor77.github.io/images/hexo-hueman-unparsed-structured-data/google-search-console.png">
+<meta property="article:published_time" content="2019-08-19T04:35:09.000Z">
+<meta property="article:modified_time" content="2022-12-26T06:02:24.385Z">
+<meta property="article:author" content="Rhyno park">
+<meta property="article:tag" content="SEO">
+<meta property="article:tag" content="Google Search Console">
+<meta property="article:tag" content="Blog">
+<meta property="article:tag" content="구조화된 데이터">
+<meta property="article:tag" content="Semantic Web">
+<meta property="article:tag" content="structure data">
+<meta property="article:tag" content="Schema.org">
+<meta property="article:tag" content="JSON-LD">
+<meta property="article:tag" content="검색엔진최적화">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gregor77.github.io/images/hexo-hueman-unparsed-structured-data/google-search-console.png">
+    
+
+    
+
+    
+        <link rel="icon" href="/css/images/favicons/favicon.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/titillium-web/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.css">
+
+
+    
+<script src="/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-145306283-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/rss2.xml" title="Rhyno Tech Blog" type="application/rss+xml">
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/" class="logo">Rhyno Tech Blog</a>
+                    </h1>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/">Home</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Blog/">Blog</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Docker/">Docker</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/React-FE/">React, FE</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Review/">Review</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Spring-security/">Spring security</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a></li></ul></li></ul>
+                                    
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/categories/Blog/">Blog</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-hexo-hueman-unparsed-structured-data" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        Hexo Hueman Theme 블로그 - 파싱할 수 없는 구조화된 데이터
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/2019/08/19/hexo-hueman-unparsed-structured-data/" class="article-date">
+            <time datetime="2019-08-19T04:35:09.000Z" itemprop="datePublished">2019-08-19</time>
+        </a>
+    </div>
+
+		        
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Blog/" rel="tag">Blog</a>, <a class="tag-link-link" href="/tags/Google-Search-Console/" rel="tag">Google Search Console</a>, <a class="tag-link-link" href="/tags/JSON-LD/" rel="tag">JSON-LD</a>, <a class="tag-link-link" href="/tags/SEO/" rel="tag">SEO</a>, <a class="tag-link-link" href="/tags/Schema-org/" rel="tag">Schema.org</a>, <a class="tag-link-link" href="/tags/Semantic-Web/" rel="tag">Semantic Web</a>, <a class="tag-link-link" href="/tags/structure-data/" rel="tag">structure data</a>, <a class="tag-link-link" href="/tags/%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84%EC%B5%9C%EC%A0%81%ED%99%94/" rel="tag">검색엔진최적화</a>, <a class="tag-link-link" href="/tags/%EA%B5%AC%EC%A1%B0%ED%99%94%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0/" rel="tag">구조화된 데이터</a>
+    </div>
+
+            </div>
+        
+<!--        <div class="article-pv">-->
+<!--            <span class="sns-icon fa-eye">-->
+<!--                0-->
+<!--            </span>-->
+<!--        </div>-->
+        
+        <div class="article-entry" itemprop="articleBody">
+            <p>Hexo Hueman 테마를 사용하여 개발자 블로그를 운영중이다. 그런데 새로 작성한 글들이 구글에서 조회가 되지 않는 것이다.<br>처음에는 크롤링을 하지 않아서 그런 것이겠지 했는데, 몇일이 지나도 계속 조회가 되지 않았다.<br>이번 글은 Google Search Console을 통해서 구글에서 작성한 글이 검색되도록 한 과정과 용어들을 공유하겠다. </p>
+<h2 id="Google-Search-Console"><a href="#Google-Search-Console" class="headerlink" title="Google Search Console"></a>Google Search Console</h2><p>처음 개발자 블로그를 만들고 <strong>구글에 블로그를 노출시키기 위해서, sitemap을 추가하기 위해 Google Search Console을 처음 접했다.</strong><br>그리고 얼마후 블로그에 게시한 글들이 구글에서 조회가 되는 것을 보고, 그 이후에는 Google Search Console에 따로 접속하지 않았다.</p>
+<p>최초에 landscape 테마를 사용하다가, 너무 클래식한거 같아서 Hueman 테마로 변경했다. 그런데 Hueman 테마로 변경후부터 구글에서 새로운 글이 검색이 되지 않았다.<br>Google Search Console에 접속해서 “실적” 메뉴를 보면 페이지 노출수를 확인할 수 있다. 예상대로 새로 작성된 post 자체가 보이지 않았다.</p>
+<p><img src="/images/hexo-hueman-unparsed-structured-data/google-search-console.png" alt="#Google Search Console - 실적 메뉴"></p>
+<p>Search Console에 등록된 블로그의 sitemap.xml은 잘 조회되고 있었기 때문에, 혹시 Googlebot이 크롤링을 제대로 못하는 것이 아닌가 의심이 갔다.<br>Search Console에서 “URL 검사”라는 메뉴를 사용하면 입력된 URL 주소로 Google에서 생성한 색인의 현재 상태를 확인할 수 있었다.</p>
+<p><strong>원인은 Hueman Theme에서 새로 작성한 글들은 “파싱할 수 없는 구조화된 데이터” 에러를 발생하고 있었고 Googlebot이 크롤링을 실패하면서 검색이 안 되는 것이었다.</strong><br>에러 내용을 클릭하면, 오른쪽 탭에 “크롤링된 페이지” 상세 정보를 확인할 수 있고, 마치 개발자도구 처럼 어디 부분에서 에러가 발생했는지 확인할 수 있다.<br>이미 크롤링되서 색인된 페이지가 아닌, URL 기반으로 실시간으로 테스트를 해서 현재 페이지의 상태를 확인하고, 색인생성 가능여부를 판단할 수 있다  .</p>
+<p><img src="/images/hexo-hueman-unparsed-structured-data/url-test2-realtime-test.png" alt="#URL 검사 - &quot;파싱할 수 없는 구조화된 데이터&quot;"></p>
+<h4 id="해결방법-구조화된-데이터-테스팅-도구"><a href="#해결방법-구조화된-데이터-테스팅-도구" class="headerlink" title="해결방법 : 구조화된 데이터 테스팅 도구"></a>해결방법 : <a target="_blank" rel="noopener" href="https://search.google.com/structured-data/testing-tool">구조화된 데이터 테스팅 도구</a></h4><p>구조화된 데이터 테스트 도구를 사용하면, 입력된 URL에 조회되는 데이터의 구문을 수정하고 테스트 할 수 있다. 마치 개발자 도구처럼 데이터를 수정할 수 있고, 오른쪽에 현재 데이터 상태를 바로 확인할 수 있기 때문에 편하다.<br>URL에 내 블로그에 등록된 글 주소를 입력해보았는데 역시나 구조화된 데이터로 파싱되지 못하는 에러가 있었다.</p>
+<h5 id="오류-카테고리가-없는-오류-Object-parsing-실패"><a href="#오류-카테고리가-없는-오류-Object-parsing-실패" class="headerlink" title="[오류] 카테고리가 없는 오류 - Object parsing 실패"></a><strong>[오류] 카테고리가 없는 오류 - Object parsing 실패</strong></h5><ul>
+<li>JSON-LD: 개체 선언에 “,” 또는 “}”가 누락되었습니다.</li>
+<li>JSON-LD 값을 확인하면, “description”의 값 다음에 “,”가 없어서 제대로된 Object로 인지를 못한다.<br><img src="/images/hexo-hueman-unparsed-structured-data/structured-data-test-tool.png" alt="#카테고리가 없는 오류"></li>
+</ul>
+<p>description의 값 다음에 “,”을 추가하고 다시 테스트를 해보면, 해당 에러는 없어지고 JSON-LD에 publisher, mainEntityOfPage 속성을 추가하라는 경고와 오류가 발생한다.<br><img src="/images/hexo-hueman-unparsed-structured-data/json-ld-add-attributes.png" alt="#BlogPosting - publisher, mainEntityOfPage 추가"></p>
+<h5 id="오류-JSON-LD-속성-추가-publisher-mainEntityOfPage"><a href="#오류-JSON-LD-속성-추가-publisher-mainEntityOfPage" class="headerlink" title="[오류] JSON-LD 속성 추가 - publisher, mainEntityOfPage"></a><strong>[오류] JSON-LD 속성 추가 - publisher, mainEntityOfPage</strong></h5><p><strong>Hexo에 Hueman 테마를 보면 ld_json.ejs 파일이 있다.</strong> 파일을 보면, JSON을 사용하여 JSON을 RDF로 변환하는데 필요한 모델의 추가적인 매핑정보가 작성되어 있다.<br>JSON-LD를 표현하는 방식은 <a target="_blank" rel="noopener" href="https://schema.org/">Schema.org 사이트</a>를 참고하면 의미와 사용법에 대해서 상세히 설명되어 있다.<br>아래처럼 ld_json.ejs 파일을 변경하고, hexo로 다시 deploy 후 Google Search Console에서 실시간 URL 검사를 하면 정상적으로 나오는 것을 확인할 수 있다.<br><strong>hexo deploy를 한다고 해서 Googlebot이 바로 크롤링을 하지 않기 때문에, 실시간 테스트를 통해 테스트를 해야한다.</strong></p>
+<ul>
+<li><strong>description의 값 뒤에 “,” 추가</strong></li>
+<li><strong><a target="_blank" rel="noopener" href="https://schema.org/publisher">publisher</a> 속성 추가</strong><ul>
+<li>페이지의 출판자를 의미</li>
+</ul>
+</li>
+<li><strong><a href="(https://schema.org/mainEntityOfPage">mainEntityOfPage</a> 속성 추가</strong><ul>
+<li>설명중인 주요 항목인 페이지에 대한 설명을 의</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ld_json.ejs 파일 변경</span></span><br><span class="line">&lt;script type=<span class="string">&quot;application/ld+json&quot;</span>&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;@context&quot;</span>: <span class="string">&quot;https://schema.org&quot;</span>,</span><br><span class="line">        <span class="string">&quot;@type&quot;</span>: <span class="string">&quot;BlogPosting&quot;</span>,</span><br><span class="line">        <span class="string">&quot;author&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;@type&quot;</span>: <span class="string">&quot;Person&quot;</span>,</span><br><span class="line">            <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&lt;%= config.author %&gt;&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &lt;% <span class="keyword">if</span> (post.<span class="property">title</span>) &#123; %&gt;<span class="string">&quot;headline&quot;</span>: <span class="string">&quot;&lt;%= post.title %&gt;&quot;</span>,&lt;% &#125; %&gt;</span><br><span class="line">        <span class="string">&quot;image&quot;</span>: <span class="string">&quot;&lt;%- url_for(config.url + thumbnail(post)) %&gt;&quot;</span>,</span><br><span class="line">        &lt;% <span class="keyword">if</span> (post.<span class="property">tags</span>) &#123; %&gt;<span class="string">&quot;keywords&quot;</span>: <span class="string">&quot;&lt;%- post.tags.map(t =&gt; t.name).join(&#x27; &#x27;) %&gt;&quot;</span>,&lt;% &#125; %&gt;</span><br><span class="line">        &lt;% <span class="keyword">if</span> (post.<span class="property">categories</span>) &#123; %&gt;<span class="string">&quot;genre&quot;</span>: <span class="string">&quot;&lt;%- post.categories.map(c =&gt; c.name).join(&#x27; &#x27;) %&gt;&quot;</span>,&lt;% &#125; %&gt;</span><br><span class="line">        <span class="string">&quot;datePublished&quot;</span>: <span class="string">&quot;&lt;%- date(post.date, &#x27;YYYY-MM-DD&#x27;) %&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;dateCreated&quot;</span>: <span class="string">&quot;&lt;%- date(post.date, &#x27;YYYY-MM-DD&#x27;) %&gt;&quot;</span>,</span><br><span class="line">        &lt;% <span class="keyword">if</span> (post.<span class="property">updated</span>) &#123; %&gt;<span class="string">&quot;dateModified&quot;</span>: <span class="string">&quot;&lt;%- date(post.updated, &#x27;YYYY-MM-DD&#x27;) %&gt;&quot;</span>,&lt;% &#125; %&gt;</span><br><span class="line">        <span class="string">&quot;url&quot;</span>: <span class="string">&quot;&lt;%- url_for(config.url + &#x27;/&#x27; + post.path) %&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;description&quot;</span>: <span class="string">&quot;&lt;%- excerpt(post) %&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;wordCount&quot;</span>: <span class="string">&quot;&lt;%- post.content.split(&#x27; &#x27;).length %&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;publisher&quot;</span>: <span class="string">&quot;&lt;%= config.author %&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;mainEntityOfPage&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;@type&quot;</span>: <span class="string">&quot;WebPage&quot;</span>,</span><br><span class="line">            <span class="string">&quot;@id&quot;</span>: <span class="string">&quot;&lt;%- url_for(config.url + &#x27;/&#x27; + post.path) %&gt;&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/hexo-hueman-unparsed-structured-data/search-console-url-success.png" alt="#Google Search Console - URL 실시간 검사 성공"></p>
+<h2 id="SEO-Sementic-Web-JSON-LD"><a href="#SEO-Sementic-Web-JSON-LD" class="headerlink" title="SEO, Sementic Web, JSON-LD"></a>SEO, Sementic Web, JSON-LD</h2><p>구글에서는 크롤링을 할때 수집하려는 리소스가 구조화된 데이터인지를 확인하고, 구조화된 데이터인 경우만 정상적으로 크롤링을 하고 색인을 만드는 과정을 거친다.<br>그리고 사용자가 검색시, 구글 검색 사이트에서 검색 결과는 생성된 색인들 내에서 조회되는 과정을 거친다.</p>
+<p><img src="/images/hexo-hueman-unparsed-structured-data/semantic-web.png" alt="#Semantic Web과 Schema.org 관계"></p>
+<h4 id="검색-엔진-최적화-Search-Engine-Optimization-SEO"><a href="#검색-엔진-최적화-Search-Engine-Optimization-SEO" class="headerlink" title="검색 엔진 최적화 (Search Engine Optimization, SEO)"></a>검색 엔진 최적화 (Search Engine Optimization, SEO)</h4><p>블로그 글을 작성하면서, 내가 작성한 글이 비슷한 고민을 하는 사람에게 노출되면 좋을 것 같다는 생각을 했다. 개인도 이러한데 특히 온라인 쇼핑몰이나 돈이 오가는 사이트의 경우, 사용자가 키워드로 검색시 상위에 노출되는 것이 매출과 직결될 것이다.</p>
+<blockquote>
+<p>검색엔진최적화는 웹 페이지 검색엔진이 자료를 수집하고 순위를 매기는 방식에 맞게 웹 페이지를 구성해서 검색 결과의 상위에 나올 수 있도록 하는 작업을 말한다.<br>-위키피디아: 검색 엔진 최적화-</p>
+</blockquote>
+<h4 id="Semantic-Web"><a href="#Semantic-Web" class="headerlink" title="Semantic Web"></a>Semantic Web</h4><p>작성중</p>
+<h4 id="Schema-org"><a href="#Schema-org" class="headerlink" title="Schema.org"></a>Schema.org</h4><p>작성중</p>
+<h4 id="JSON-LD"><a href="#JSON-LD" class="headerlink" title="JSON-LD"></a>JSON-LD</h4><p>작성중</p>
+<h2 id="결론"><a href="#결론" class="headerlink" title="결론"></a>결론</h2><p>Hexo와 Github을 이용해서 개발자 블로그를 만들면서 SEO (검색엔진최적화)란 용어를 처음 들었다. 구글, 네이버, 다음 검색사이트에 블로그를 노출하기 위했던 일들을 생각해보자.</p>
+<ol>
+<li>sitemap 또는 rss 생성 및 웹마스터 도구 등록</li>
+</ol>
+<ul>
+<li>네이버는 rss2방식을 제공하기 때문에 추가함</li>
+</ul>
+<ol start="2">
+<li>robots.txt 생성</li>
+</ol>
+<ul>
+<li>robots.txt 파일을 통해서 검색 사이트에서 크롤러가 작업을 할때 블로그에 크롤링 가능한 파일, 불가능 파일을 정리하고 거기에 따르도록 지시할 수 있다.</li>
+<li>구글 같은 경우에는 크롤링이 실패할 경우, 새로 작성한 파일의 색인을 만들지 못하고, 변경한 글의 경우 이전에 작성한 내용이 노출되었다.</li>
+</ul>
+<p><strong>사내 시스템이나 B2B 사이트를 만들때는 전혀 생각하지 못했던 것들을 Hexo + Github으로 개발자 블로그를 만들면서 “SEO (검색엔진최적화)를 위한 Tip”을 알게 되서 의미있었다.</strong><br>Blog를 손쉽게 만들어주는 Hexo나 Jekyll 각각 마다 손쉽게 SEO를 적용할 있는 라이브러리들이 많았다. 블로그를 검색 사이트에 노출하기 위한 작업을 통해서 어떻게 검색사이트가 리소스들을 검색엔진에 노출시키는지 이해할 수 있었다.</p>
+<h2 id="참조-사이트"><a href="#참조-사이트" class="headerlink" title="참조 사이트"></a>참조 사이트</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://support.google.com/webmasters/answer/9166415#error_types">[Google Search Console - 파싱할 수 없는 구조화된 데이터 보고서]</a></li>
+<li><a target="_blank" rel="noopener" href="https://ko.wikipedia.org/wiki/JSON-LD">[JSON-LD 위키피디아 설]</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.outsider.ne.kr/1214">[Outsider님의 Schema.org로 웹 컨텐츠 조화하기 ]</a></li>
+</ul>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="http://gregor77.github.io/2019/08/19/hexo-hueman-unparsed-structured-data/" data-id="clc4e92ne000ll8w45gb99nw1" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "Rhyno park"
+        },
+        "headline": "Hexo Hueman Theme 블로그 - 파싱할 수 없는 구조화된 데이터",
+        "image": "http://gregor77.github.io/images/hexo-hueman-unparsed-structured-data/google-search-console.png",
+        "keywords": "SEO Google Search Console Blog 구조화된 데이터 Semantic Web structure data Schema.org JSON-LD 검색엔진최적화",
+        "genre": "Blog",
+        "datePublished": "2019-08-19",
+        "dateCreated": "2019-08-19",
+        "dateModified": "2022-12-26",
+        "url": "http://gregor77.github.io/2019/08/19/hexo-hueman-unparsed-structured-data/",
+        "description": "Hexo Hueman 테마를 사용하여 개발자 블로그를 운영중이다. 그런데 새로 작성한 글들이 구글에서 조회가 되지 않는 것이다.처음에는 크롤링을 하지 않아서 그런 것이겠지 했는데, 몇일이 지나도 계속 조회가 되지 않았다.이번 글은 Google Search Console을 통해서 구글에서 작성한 글이 검색되도록 한 과정과 용어들을 공유하겠다. 
+Google ",
+        "wordCount": "1123",
+        "publisher": "Rhyno park",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http://gregor77.github.io/2019/08/19/hexo-hueman-unparsed-structured-data/"
+        }
+    }
+</script>
+
+</article>
+
+    <section id="comments">
+    
+        
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
+    
+    </section>
+
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>follow:</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="linkedin" href="https://www.linkedin.com/in/sung-jin-park-376314103" target="_blank" rel="noopener">
+                        <i class="icon fa fa-linkedin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/gregor77?tab=repositories" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/09/14/book-review-study-c-alone/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">newer</strong>
+        <p class="article-nav-title">
+        
+            서평 - 혼자 공부하는 C언어
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/2019/08/16/about-unit-test/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">older</strong>
+        <p class="article-nav-title">Unit Test (단위 테스트) 에 관한 생각</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">recents</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/jodit-editor/editor-image.png)" alt="Jodit Editor를 사용하여 게시판 만들기" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/React-FE/">React, FE</a></p>
+                            <p class="item-title"><a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="title">Jodit Editor를 사용하여 게시판 만들기</a></p>
+                            <p class="item-date"><time datetime="2022-12-26T06:07:42.000Z" itemprop="datePublished">2022-12-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/book-review-infra-engineer-book/인프라엔지니어의교과서.PNG)" alt="서평 - 인프라 엔지니어의 교과서" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Review/">Review</a></p>
+                            <p class="item-title"><a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="title">서평 - 인프라 엔지니어의 교과서</a></p>
+                            <p class="item-date"><time datetime="2021-06-11T00:39:56.000Z" itemprop="datePublished">2021-06-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/05/18/spring-security-03/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/03/spring-security-authentication-architecture-provider.png)" alt="Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/05/18/spring-security-03/" class="title">Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider</a></p>
+                            <p class="item-date"><time datetime="2021-05-18T06:37:17.000Z" itemprop="datePublished">2021-05-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/21/spring-security-02/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/authority_role_granularity.png)" alt="Spring Security - 2. Role과 권한(Privilege)" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/21/spring-security-02/" class="title">Spring Security - 2. Role과 권한(Privilege)</a></p>
+                            <p class="item-date"><time datetime="2021-04-21T07:40:17.000Z" itemprop="datePublished">2021-04-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/19/spring-security-01/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/securitycontextholder.png)" alt="Spring Security - 1. Authentication, SecurityContextHolder" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/19/spring-security-01/" class="title">Spring Security - 1. Authentication, SecurityContextHolder</a></p>
+                            <p class="item-date"><time datetime="2021-04-19T14:58:10.000Z" itemprop="datePublished">2021-04-19</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/React-FE/">React, FE</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-security/">Spring security</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a><span class="category-list-count">1</span></li></ul></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Authentication/" style="font-size: 20px;">Authentication</a> <a href="/tags/AuthenticationManager/" style="font-size: 10px;">AuthenticationManager</a> <a href="/tags/AuthenticationProvider/" style="font-size: 10px;">AuthenticationProvider</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C-%EC%96%B8%EC%96%B4/" style="font-size: 10px;">C 언어</a> <a href="/tags/Controller-Test/" style="font-size: 10px;">Controller Test</a> <a href="/tags/CountDownLatch/" style="font-size: 10px;">CountDownLatch</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Docker-%EC%8B%A4%EC%8A%B5/" style="font-size: 10px;">Docker 실습</a> <a href="/tags/Github-blog/" style="font-size: 10px;">Github blog</a> <a href="/tags/Google-Analytics/" style="font-size: 10px;">Google Analytics</a> <a href="/tags/Google-Search-Console/" style="font-size: 20px;">Google Search Console</a> <a href="/tags/GrantedAuthority/" style="font-size: 10px;">GrantedAuthority</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Hybrid-Test/" style="font-size: 10px;">Hybrid Test</a> <a href="/tags/JSON-LD/" style="font-size: 10px;">JSON-LD</a> <a href="/tags/Jodit-Editor/" style="font-size: 10px;">Jodit, Editor</a> <a href="/tags/Multi-Thread/" style="font-size: 10px;">Multi Thread</a> <a href="/tags/Privilege/" style="font-size: 10px;">Privilege</a> <a href="/tags/ProviderManager/" style="font-size: 10px;">ProviderManager</a> <a href="/tags/Role/" style="font-size: 10px;">Role</a> <a href="/tags/SEO/" style="font-size: 20px;">SEO</a> <a href="/tags/SW-Engineering/" style="font-size: 20px;">SW Engineering</a> <a href="/tags/Schema-org/" style="font-size: 10px;">Schema.org</a> <a href="/tags/SecurityContextHolder/" style="font-size: 10px;">SecurityContextHolder</a> <a href="/tags/Semantic-Web/" style="font-size: 10px;">Semantic Web</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Security/" style="font-size: 20px;">Spring Security</a> <a href="/tags/Spring-security/" style="font-size: 10px;">Spring security</a> <a href="/tags/TDD/" style="font-size: 20px;">TDD</a> <a href="/tags/Unit-Test/" style="font-size: 10px;">Unit Test</a> <a href="/tags/Unit-Test-Anti-Pattern/" style="font-size: 10px;">Unit Test Anti Pattern</a> <a href="/tags/Unit-test/" style="font-size: 20px;">Unit test</a> <a href="/tags/UserDetailsService/" style="font-size: 10px;">UserDetailsService</a> <a href="/tags/structure-data/" style="font-size: 10px;">structure data</a> <a href="/tags/%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84%EC%B5%9C%EC%A0%81%ED%99%94/" style="font-size: 10px;">검색엔진최적화</a> <a href="/tags/%EA%B5%AC%EC%A1%B0%ED%99%94%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0/" style="font-size: 10px;">구조화된 데이터</a> <a href="/tags/%EA%B8%B8%EB%B2%97/" style="font-size: 10px;">길벗</a> <a href="/tags/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%A4%ED%8C%A8/" style="font-size: 10px;">단위 테스트 실패</a> <a href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" style="font-size: 20px;">단위테스트</a> <a href="/tags/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D%EA%B3%BC-%EC%84%A4%EA%B3%84/" style="font-size: 10px;">요구사항 분석과 설계</a> <a href="/tags/%EC%9D%B8%EC%A6%9D-%EC%A0%88%EC%B0%A8/" style="font-size: 10px;">인증 절차</a> <a href="/tags/%EC%9D%B8%ED%94%84%EB%9D%BC-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98-%EA%B5%90%EA%B3%BC%EC%84%9C/" style="font-size: 10px;">인프라 엔지니어의 교과서</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://github.com/gregor77?tab=repositories">Rhyno Git Repository</a>
+                    </li>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/sung-jin-park-376314103">Rhyno LinkedIn</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/" class="logo"></a>
+                </h1>
+                <p>&copy; 2022 Rhyno park</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+        
+    
+    <script>
+    var disqus_shortname = 'hexo-theme-hueman';
+    
+    
+    var disqus_url = 'http://gregor77.github.io/2019/08/19/hexo-hueman-unparsed-structured-data/';
+    
+    (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

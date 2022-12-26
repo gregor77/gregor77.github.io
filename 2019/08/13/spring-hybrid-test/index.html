@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    
+
+    
+    <title>Spring - 내가 짜는 Controller Test가 Hybrid Test? | Rhyno Tech Blog</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="Unit test,단위테스트,TDD,Spring,Controller Test,Hybrid Test" />
+    
+    <meta name="description" content="Spring 기반에서 Controller 테스트를 작성시 요청을 보내고, 응답을 확인하는 형태로 많이 작성한다.그러다 보니 MockMvc나 jsonPath를 조합해서 Controller 테스트를 작성하는 경우가 많다.이번 포스팅은 MockMvc 기반의 Controller 테스트 작성방식을 다른 관점에서 볼 수 있는 경험담이다. 1. Hybrid Testin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring - 내가 짜는 Controller Test가 Hybrid Test?">
+<meta property="og:url" content="http://gregor77.github.io/2019/08/13/spring-hybrid-test/index.html">
+<meta property="og:site_name" content="Rhyno Tech Blog">
+<meta property="og:description" content="Spring 기반에서 Controller 테스트를 작성시 요청을 보내고, 응답을 확인하는 형태로 많이 작성한다.그러다 보니 MockMvc나 jsonPath를 조합해서 Controller 테스트를 작성하는 경우가 많다.이번 포스팅은 MockMvc 기반의 Controller 테스트 작성방식을 다른 관점에서 볼 수 있는 경험담이다. 1. Hybrid Testin">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://gregor77.github.io/images/hybrid-test/Hybrid-Testing.svg">
+<meta property="article:published_time" content="2019-08-13T10:24:31.000Z">
+<meta property="article:modified_time" content="2022-12-26T06:02:24.385Z">
+<meta property="article:author" content="Rhyno park">
+<meta property="article:tag" content="Unit test">
+<meta property="article:tag" content="단위테스트">
+<meta property="article:tag" content="TDD">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="Controller Test">
+<meta property="article:tag" content="Hybrid Test">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gregor77.github.io/images/hybrid-test/Hybrid-Testing.svg">
+    
+
+    
+
+    
+        <link rel="icon" href="/css/images/favicons/favicon.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/titillium-web/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.css">
+
+
+    
+<script src="/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-145306283-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/rss2.xml" title="Rhyno Tech Blog" type="application/rss+xml">
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/" class="logo">Rhyno Tech Blog</a>
+                    </h1>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/">Home</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Blog/">Blog</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Docker/">Docker</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/React-FE/">React, FE</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Review/">Review</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Spring-security/">Spring security</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a></li></ul></li></ul>
+                                    
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><i class="icon fa fa-angle-right"></i><a class="page-title-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-spring-hybrid-test" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        Spring - 내가 짜는 Controller Test가 Hybrid Test?
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/2019/08/13/spring-hybrid-test/" class="article-date">
+            <time datetime="2019-08-13T10:24:31.000Z" itemprop="datePublished">2019-08-13</time>
+        </a>
+    </div>
+
+		        
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Controller-Test/" rel="tag">Controller Test</a>, <a class="tag-link-link" href="/tags/Hybrid-Test/" rel="tag">Hybrid Test</a>, <a class="tag-link-link" href="/tags/Spring/" rel="tag">Spring</a>, <a class="tag-link-link" href="/tags/TDD/" rel="tag">TDD</a>, <a class="tag-link-link" href="/tags/Unit-test/" rel="tag">Unit test</a>, <a class="tag-link-link" href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" rel="tag">단위테스트</a>
+    </div>
+
+            </div>
+        
+<!--        <div class="article-pv">-->
+<!--            <span class="sns-icon fa-eye">-->
+<!--                0-->
+<!--            </span>-->
+<!--        </div>-->
+        
+        <div class="article-entry" itemprop="articleBody">
+            <p>Spring 기반에서 Controller 테스트를 작성시 요청을 보내고, 응답을 확인하는 형태로 많이 작성한다.<br>그러다 보니 MockMvc나 jsonPath를 조합해서 Controller 테스트를 작성하는 경우가 많다.<br>이번 포스팅은 MockMvc 기반의 Controller 테스트 작성방식을 다른 관점에서 볼 수 있는 경험담이다.</p>
+<h2 id="1-Hybrid-Testing"><a href="#1-Hybrid-Testing" class="headerlink" title="1. Hybrid Testing?"></a>1. Hybrid Testing?</h2><p>Thought works에서 일하다 과거 같이 일하게 된 Kris가 프로젝트에 작성된 테스트케이스들에 대해 코드리뷰 해준 경험이 있다.<br>기존의 Controller 테스트는 MockMvc를 이용해서 요청을 보내고 응답을 받는 방식으로 테스트 케이스를 작성하고 있었다.<br>그런데 Kris가 너희가 짜고 있는 Controller 테스트는 Hybrid Test에 가깝다는 말을 했다.<br>그리고 Controller 테스트를 pure한 Unit 테스트로 바꿔보는 것이 어떠겠냐고 제안을 했다.</p>
+<h4 id="Hybrid-Testing-정의"><a href="#Hybrid-Testing-정의" class="headerlink" title="Hybrid Testing 정의"></a><a target="_blank" rel="noopener" href="https://www.h2kinfosys.com/blog/hybrid-testing/">Hybrid Testing</a> 정의</h4><p>Hybrid 테스트라는 단어를 들었을때, 단순히 어휘만 보고 뜻을 유추할 뿐 어떤 의미인지 정확하게 알지 못했다. 영어가 짧아 Kris와 깊은 대화를 하지 못했지만, 정의를 보고 어떤 의미에서 그렇게 말했는지 유추해보았다.<br>첨부한 주소에 있는 내용을 기반으로 “Hybrid Testing”에 대해 정리를 해보았다.</p>
+<p><img src="/images/hybrid-test/Hybrid-Testing.svg" alt="#Hybrid Testing의 정의"></p>
+<ul>
+<li>하이브리드 테스트는 하향식 및 상향식 접근 방식의 장점을 사용하며, 테스트는 두 기술을 모두 사용해서 수행한다.</li>
+<li>레이어 구성 &#x3D; 상위 레이어 + 기본 대상 레이어 + 하위 레이어</li>
+<li>테스트는 중간 레벨 대상 계층에 중점을 두고 진행한다.</li>
+</ul>
+<h4 id="장점"><a href="#장점" class="headerlink" title="장점"></a>장점</h4><ul>
+<li>개발주기의 초기 단계에서 기본적으로 동작하는 시스템을 만들수 있도록, 가능한 빨리 동작하는 버전의 프로그램을 테스트하고 싶은 경우 채택한다.</li>
+<li>코드 커버리지의 정확성이 증가되고, 정기적인 시간 간격을 두고 최소의 테스트 케이스를 생성한다.</li>
+</ul>
+<h4 id="테스트할-내용"><a href="#테스트할-내용" class="headerlink" title="테스트할 내용"></a>테스트할 내용</h4><ul>
+<li>기능 테스트: 모든 기능이 예상대로 작동하는지 확인</li>
+<li>호환성 테스트</li>
+<li>연결 테스트: 응용 프로그램이 여러 유형의 네트워크 연결에서 올바르게 작동하는지 확인</li>
+</ul>
+<h2 id="2-Spring-Controller-Test"><a href="#2-Spring-Controller-Test" class="headerlink" title="2. Spring Controller Test"></a>2. Spring Controller Test</h2><p>Spring MVC에서 MockMvc를 이용하여 Controller 테스트를 작성하는 방식이 왜 Hybrid 테스트가 되는지 확인해보자.<br><img src="/images/hybrid-test/Spring-Mvc.svg" alt="#Spring MVC"> </p>
+<h4 id="테스트-범위"><a href="#테스트-범위" class="headerlink" title="테스트 범위"></a>테스트 범위</h4><ul>
+<li>실제로 테스트를 하려고 하는 대상(subject)는 컨트롤러의 로직이다.</li>
+<li>테스트를 동작방식이 상위 레이어를 통과하고, 하위 레이어를 다 통과해서 테스트를 한다.<ul>
+<li>SpringRunner를 통해서 아래의 어노테이션과 함께 테스트를 수행한다</li>
+<li>@SpringBootTest : 전체 Application Context 로드가 필요한 경우</li>
+<li>@WebMvcTest: 컨트롤러에 필요한 Context만 필요한 경우</li>
+</ul>
+</li>
+<li>상위 레이어<ul>
+<li>Filter, Interceptor, DispatcherServlet 포함한 Front controller 수행</li>
+<li>Request의 항목을 Object로 Deserialize 수행</li>
+<li>하위 레이어를 거친 결과가 Response로 리턴 (response body, statusCode를 체크한다)</li>
+</ul>
+</li>
+<li>하위 레이어<ul>
+<li>Controller에서 호출하는 Service 또는 Repository를 포함한 DI(Dependency Injection)를 통<br>해서 사용하는 Bean객체들은 @MockBean 어노테이션을 통해서 Mock 객체로 사용</li>
+<li>필요한 경우 Mock 객체에 Method의 호출 결과를 의도한 결과로 동작하게끔 준비한다. (Stub &#x3D;&#x3D; canned answer)</li>
+</ul>
+</li>
+</ul>
+<h4 id="장점-1"><a href="#장점-1" class="headerlink" title="장점"></a>장점</h4><ul>
+<li>검증하고자 하는 부분은 Controller 로직이지만, API가 실제 동작하는 방식으로 체크를 하기 때문에 테스트 정확도가 더 높다. </li>
+<li>개발단계에서 Test Case를 작성하고 수행함으로써 오류를 미리 파악하다.<br>(여기서 미리 파악 가능하다는 것은, 로컬에서 어플리케이션을 수행하거나, 배포하기 전에 파악이 가능한 것을 의미한다)</li>
+</ul>
+<h2 id="Functional-Test-도입"><a href="#Functional-Test-도입" class="headerlink" title="Functional Test 도입"></a>Functional Test 도입</h2><p>부르는 명칭이 조금씩 다르기는 했지만 Integration Test, API Test, Functional Test라 불렀던 것 같다.<br>물론 각 명칭마다 조금씩 차이가 있을 수 있지만 동작방식은 API 요청을 보내고, 실제 비지니스 로직과 DB를 거친 결과를 확인하는 방식이다.<br><strong>Functional Test와 Unit Test는 작성하는 목적은 다르고, 지속하기 위해서는 상당한 노력이 필요하다.</strong></p>
+<ul>
+<li>데이터 유효성 처리<ul>
+<li>Embedded DB를 도입하던가 @Transactional을 통해 데이터 유효성을 유지하던가등 Unit Test를 작성할때 하지 않았던 것들을 고민해야한다.</li>
+</ul>
+</li>
+<li>쉽게 테스트 작성하기<ul>
+<li>MockMvc와 jsonPath를 이용해 Functional Test를 작성하기 위해서는 입력값과 결과값을 작성하기 번거롭다.</li>
+<li>테스트를 지속적으로 작성하기 위해서는 작성이 쉬워야 하며, Functional Test의 경우 입력과 결과값을 최대한 단순하게 작성하는 것이 도움이 된다.</li>
+<li><a target="_blank" rel="noopener" href="http://rest-assured.io/">Rest Assured</a>를 개인적으로 추천한다. Request와 Response를 json 기반으로 작성이 가능하<br>고, 그 기반으로 Response 검증이 가능하다.</li>
+</ul>
+</li>
+</ul>
+<h4 id="Functional-Test-vs-Hybrid-Controller-Test"><a href="#Functional-Test-vs-Hybrid-Controller-Test" class="headerlink" title="Functional Test vs Hybrid Controller Test"></a>Functional Test vs Hybrid Controller Test</h4><p>팀의 성숙도와 상황에 따라 Controller Test를 어떻게 작성할 것인지 결정하면 될 것 같다.<br>이는 개인적인 경험에 따른 판단이기 때문에 다른분과 의견이 다를 수도 있습니다.</p>
+<ul>
+<li><p>Hybrid Controller Test 언제 적합할까?</p>
+<ul>
+<li>기존의 MockMvc를 통한 Controller Test 수행하면, 상위 레이어와 하위 레이어 검증이 가능하다.</li>
+<li>팀의 규모가 작은 경우</li>
+<li>팀의 테스트 케이스 작성 및 유지보수의 성숙도가 낮은 경우</li>
+<li>비지니스 로직이 단순하거나, API의 값 검증의 가성비가 낮은 경우</li>
+<li>기존의 테스트 방식으로 비슷한 효과를 낼 수 있기 때문에 유지하는 것이 현실적일 수 있다.</li>
+</ul>
+</li>
+<li><p>Functional Test 도입 + Controller Test를 Unit Test로 변경은 언제 적합할까?</p>
+<ul>
+<li>Functional Test를 도입하면 상위 레이어의 기능 검증은 Functional Test로 위임이 가능하고,<br>기존 Controller Test처럼 중복해서 검증할 필요없기 때문에 Pure한 Unit Test를 작성할 수 있다.</li>
+<li>이말은 Controller 테스트또한 Service 테스트처럼, ApplicationContext를 생성할 필요없이<br> MockitoRunner를 이용해서 테스트 작성이 가능한 것을 의미한다.</li>
+<li>실제 API의 결과를 검증하는 것이기 때문에 비지니스 로직과 DB를 거친 값을 검증한다.</li>
+<li>API의 비지니스 로직이 복잡하고, API의 값 검증이 중요한 경우</li>
+<li>팀의 규모가 어느 정도되고, 테스트 케이스 작성 및 유지보수의 성숙도가 큰 경우</li>
+</ul>
+</li>
+</ul>
+<h4 id="결론"><a href="#결론" class="headerlink" title="결론"></a>결론</h4><p>Kris의 제안대로 기존의 Controller Test 검증방식 중, 상위 레이어의 검증 대상을 Functional Test<br>로 위임하고, 기존의 Controller 테스트를 Service 테스트처럼 작성하는 것이 옳은 것일까?<br>결론은 <strong>테스트케이스를 작성하고 유지하는 팀의 성숙도에 따라 결정하면 될 것 같다.</strong> 또한 팀원들이<br>기존의 테스트가 커버하지 못하는 부분이 있어 불안함과 부족함을 느낀다면 그때 시도해보는 것도 추천한다.</p>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="http://gregor77.github.io/2019/08/13/spring-hybrid-test/" data-id="clc4e92nf000ml8w47kal5amg" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "Rhyno park"
+        },
+        "headline": "Spring - 내가 짜는 Controller Test가 Hybrid Test?",
+        "image": "http://gregor77.github.io/images/hybrid-test/Hybrid-Testing.svg",
+        "keywords": "Unit test 단위테스트 TDD Spring Controller Test Hybrid Test",
+        "genre": "Unit Test & TDD Spring",
+        "datePublished": "2019-08-13",
+        "dateCreated": "2019-08-13",
+        "dateModified": "2022-12-26",
+        "url": "http://gregor77.github.io/2019/08/13/spring-hybrid-test/",
+        "description": "Spring 기반에서 Controller 테스트를 작성시 요청을 보내고, 응답을 확인하는 형태로 많이 작성한다.그러다 보니 MockMvc나 jsonPath를 조합해서 Controller 테스트를 작성하는 경우가 많다.이번 포스팅은 MockMvc 기반의 Controller 테스트 작성방식을 다른 관점에서 볼 수 있는 경험담이다.
+1. Hybrid Testin",
+        "wordCount": "703",
+        "publisher": "Rhyno park",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http://gregor77.github.io/2019/08/13/spring-hybrid-test/"
+        }
+    }
+</script>
+
+</article>
+
+    <section id="comments">
+    
+        
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
+    
+    </section>
+
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>follow:</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="linkedin" href="https://www.linkedin.com/in/sung-jin-park-376314103" target="_blank" rel="noopener">
+                        <i class="icon fa fa-linkedin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/gregor77?tab=repositories" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/08/16/about-unit-test/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">newer</strong>
+        <p class="article-nav-title">
+        
+            Unit Test (단위 테스트) 에 관한 생각
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/2019/08/12/hexo-github-blog/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">older</strong>
+        <p class="article-nav-title">Hexo 기반의 Github 개발자 블로그 만들기</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">recents</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/jodit-editor/editor-image.png)" alt="Jodit Editor를 사용하여 게시판 만들기" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/React-FE/">React, FE</a></p>
+                            <p class="item-title"><a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="title">Jodit Editor를 사용하여 게시판 만들기</a></p>
+                            <p class="item-date"><time datetime="2022-12-26T06:07:42.000Z" itemprop="datePublished">2022-12-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/book-review-infra-engineer-book/인프라엔지니어의교과서.PNG)" alt="서평 - 인프라 엔지니어의 교과서" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Review/">Review</a></p>
+                            <p class="item-title"><a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="title">서평 - 인프라 엔지니어의 교과서</a></p>
+                            <p class="item-date"><time datetime="2021-06-11T00:39:56.000Z" itemprop="datePublished">2021-06-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/05/18/spring-security-03/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/03/spring-security-authentication-architecture-provider.png)" alt="Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/05/18/spring-security-03/" class="title">Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider</a></p>
+                            <p class="item-date"><time datetime="2021-05-18T06:37:17.000Z" itemprop="datePublished">2021-05-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/21/spring-security-02/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/authority_role_granularity.png)" alt="Spring Security - 2. Role과 권한(Privilege)" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/21/spring-security-02/" class="title">Spring Security - 2. Role과 권한(Privilege)</a></p>
+                            <p class="item-date"><time datetime="2021-04-21T07:40:17.000Z" itemprop="datePublished">2021-04-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/19/spring-security-01/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/securitycontextholder.png)" alt="Spring Security - 1. Authentication, SecurityContextHolder" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/19/spring-security-01/" class="title">Spring Security - 1. Authentication, SecurityContextHolder</a></p>
+                            <p class="item-date"><time datetime="2021-04-19T14:58:10.000Z" itemprop="datePublished">2021-04-19</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/React-FE/">React, FE</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-security/">Spring security</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a><span class="category-list-count">1</span></li></ul></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Authentication/" style="font-size: 20px;">Authentication</a> <a href="/tags/AuthenticationManager/" style="font-size: 10px;">AuthenticationManager</a> <a href="/tags/AuthenticationProvider/" style="font-size: 10px;">AuthenticationProvider</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C-%EC%96%B8%EC%96%B4/" style="font-size: 10px;">C 언어</a> <a href="/tags/Controller-Test/" style="font-size: 10px;">Controller Test</a> <a href="/tags/CountDownLatch/" style="font-size: 10px;">CountDownLatch</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Docker-%EC%8B%A4%EC%8A%B5/" style="font-size: 10px;">Docker 실습</a> <a href="/tags/Github-blog/" style="font-size: 10px;">Github blog</a> <a href="/tags/Google-Analytics/" style="font-size: 10px;">Google Analytics</a> <a href="/tags/Google-Search-Console/" style="font-size: 20px;">Google Search Console</a> <a href="/tags/GrantedAuthority/" style="font-size: 10px;">GrantedAuthority</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Hybrid-Test/" style="font-size: 10px;">Hybrid Test</a> <a href="/tags/JSON-LD/" style="font-size: 10px;">JSON-LD</a> <a href="/tags/Jodit-Editor/" style="font-size: 10px;">Jodit, Editor</a> <a href="/tags/Multi-Thread/" style="font-size: 10px;">Multi Thread</a> <a href="/tags/Privilege/" style="font-size: 10px;">Privilege</a> <a href="/tags/ProviderManager/" style="font-size: 10px;">ProviderManager</a> <a href="/tags/Role/" style="font-size: 10px;">Role</a> <a href="/tags/SEO/" style="font-size: 20px;">SEO</a> <a href="/tags/SW-Engineering/" style="font-size: 20px;">SW Engineering</a> <a href="/tags/Schema-org/" style="font-size: 10px;">Schema.org</a> <a href="/tags/SecurityContextHolder/" style="font-size: 10px;">SecurityContextHolder</a> <a href="/tags/Semantic-Web/" style="font-size: 10px;">Semantic Web</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Security/" style="font-size: 20px;">Spring Security</a> <a href="/tags/Spring-security/" style="font-size: 10px;">Spring security</a> <a href="/tags/TDD/" style="font-size: 20px;">TDD</a> <a href="/tags/Unit-Test/" style="font-size: 10px;">Unit Test</a> <a href="/tags/Unit-Test-Anti-Pattern/" style="font-size: 10px;">Unit Test Anti Pattern</a> <a href="/tags/Unit-test/" style="font-size: 20px;">Unit test</a> <a href="/tags/UserDetailsService/" style="font-size: 10px;">UserDetailsService</a> <a href="/tags/structure-data/" style="font-size: 10px;">structure data</a> <a href="/tags/%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84%EC%B5%9C%EC%A0%81%ED%99%94/" style="font-size: 10px;">검색엔진최적화</a> <a href="/tags/%EA%B5%AC%EC%A1%B0%ED%99%94%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0/" style="font-size: 10px;">구조화된 데이터</a> <a href="/tags/%EA%B8%B8%EB%B2%97/" style="font-size: 10px;">길벗</a> <a href="/tags/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%A4%ED%8C%A8/" style="font-size: 10px;">단위 테스트 실패</a> <a href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" style="font-size: 20px;">단위테스트</a> <a href="/tags/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D%EA%B3%BC-%EC%84%A4%EA%B3%84/" style="font-size: 10px;">요구사항 분석과 설계</a> <a href="/tags/%EC%9D%B8%EC%A6%9D-%EC%A0%88%EC%B0%A8/" style="font-size: 10px;">인증 절차</a> <a href="/tags/%EC%9D%B8%ED%94%84%EB%9D%BC-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98-%EA%B5%90%EA%B3%BC%EC%84%9C/" style="font-size: 10px;">인프라 엔지니어의 교과서</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://github.com/gregor77?tab=repositories">Rhyno Git Repository</a>
+                    </li>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/sung-jin-park-376314103">Rhyno LinkedIn</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/" class="logo"></a>
+                </h1>
+                <p>&copy; 2022 Rhyno park</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+        
+    
+    <script>
+    var disqus_shortname = 'hexo-theme-hueman';
+    
+    
+    var disqus_url = 'http://gregor77.github.io/2019/08/13/spring-hybrid-test/';
+    
+    (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

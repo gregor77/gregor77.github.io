@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    
+
+    
+    <title>Spring Security - 2. Role과 권한(Privilege) | Rhyno Tech Blog</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="Spring Security,Authentication,UserDetailsService,Role,GrantedAuthority,Privilege" />
+    
+    <meta name="description" content="Role과 권한을 조회하는 UserDetailsService이번 시간에는 SecurityContext에 보관되는 Authentication, Role과 권한(Authority 또는 Privilege)에 대해 알아보겠다.경험을 바탕으로 Role과 권한의 차이는 무엇이고, 실습 예제로 어떻게 Spring Security에서 GrantedAuthority를 관리">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security - 2. Role과 권한(Privilege)">
+<meta property="og:url" content="http://gregor77.github.io/2021/04/21/spring-security-02/index.html">
+<meta property="og:site_name" content="Rhyno Tech Blog">
+<meta property="og:description" content="Role과 권한을 조회하는 UserDetailsService이번 시간에는 SecurityContext에 보관되는 Authentication, Role과 권한(Authority 또는 Privilege)에 대해 알아보겠다.경험을 바탕으로 Role과 권한의 차이는 무엇이고, 실습 예제로 어떻게 Spring Security에서 GrantedAuthority를 관리">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://gregor77.github.io/images/spring-security/authority_role_granularity.png">
+<meta property="article:published_time" content="2021-04-21T07:40:17.000Z">
+<meta property="article:modified_time" content="2022-12-26T06:02:24.385Z">
+<meta property="article:author" content="Rhyno park">
+<meta property="article:tag" content="Spring Security">
+<meta property="article:tag" content="Authentication">
+<meta property="article:tag" content="UserDetailsService">
+<meta property="article:tag" content="Role">
+<meta property="article:tag" content="GrantedAuthority">
+<meta property="article:tag" content="Privilege">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gregor77.github.io/images/spring-security/authority_role_granularity.png">
+    
+
+    
+
+    
+        <link rel="icon" href="/css/images/favicons/favicon.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/titillium-web/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.css">
+
+
+    
+<script src="/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-145306283-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/rss2.xml" title="Rhyno Tech Blog" type="application/rss+xml">
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/" class="logo">Rhyno Tech Blog</a>
+                    </h1>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/">Home</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Blog/">Blog</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Docker/">Docker</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/React-FE/">React, FE</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Review/">Review</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Spring-security/">Spring security</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a></li></ul></li></ul>
+                                    
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/categories/Spring-security/">Spring security</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-spring-security-02" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        Spring Security - 2. Role과 권한(Privilege)
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/2021/04/21/spring-security-02/" class="article-date">
+            <time datetime="2021-04-21T07:40:17.000Z" itemprop="datePublished">2021-04-21</time>
+        </a>
+    </div>
+
+		        
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Authentication/" rel="tag">Authentication</a>, <a class="tag-link-link" href="/tags/GrantedAuthority/" rel="tag">GrantedAuthority</a>, <a class="tag-link-link" href="/tags/Privilege/" rel="tag">Privilege</a>, <a class="tag-link-link" href="/tags/Role/" rel="tag">Role</a>, <a class="tag-link-link" href="/tags/Spring-Security/" rel="tag">Spring Security</a>, <a class="tag-link-link" href="/tags/UserDetailsService/" rel="tag">UserDetailsService</a>
+    </div>
+
+            </div>
+        
+<!--        <div class="article-pv">-->
+<!--            <span class="sns-icon fa-eye">-->
+<!--                0-->
+<!--            </span>-->
+<!--        </div>-->
+        
+        <div class="article-entry" itemprop="articleBody">
+            <h1 id="Role과-권한을-조회하는-UserDetailsService"><a href="#Role과-권한을-조회하는-UserDetailsService" class="headerlink" title="Role과 권한을 조회하는 UserDetailsService"></a>Role과 권한을 조회하는 UserDetailsService</h1><p>이번 시간에는 SecurityContext에 보관되는 Authentication, Role과 권한(Authority 또는 Privilege)에 대해 알아보겠다.<br>경험을 바탕으로 Role과 권한의 차이는 무엇이고, 실습 예제로 어떻게 Spring Security에서 GrantedAuthority를 관리하는지 알아보자.</p>
+<p>이번 글을 통해서 아래 내용을 이해하자.</p>
+<ul>
+<li>Spring Security 기반 <strong>Role 과 권한 설계</strong></li>
+<li><strong>사용자 정보를 조회하는 UserDetailsService</strong></li>
+</ul>
+<p>참고로 Spring Security에서 GrantedAuthority와 일반적인 권한을 의미하는 단어로 Authority를 사용하면 단어가 비슷해 혼란을 줄 수 있다고 생각한다.<br>따라서 <strong>이하 본문에서는 권한을 Privilege로 표현하고, GrantedAuthority는 따로 설명을 진행하겠다.</strong></p>
+<h2 id="1-Role과-권한-Privilege-설계"><a href="#1-Role과-권한-Privilege-설계" class="headerlink" title="1. Role과 권한(Privilege) 설계"></a>1. Role과 권한(Privilege) 설계</h2><p>Spring Security에서 Role과 권한(Privilege)을 어떻게 설계해야 된다는 직접적인 가이드는 없다. 기존에 플젝에서 경험을 <a target="_blank" rel="noopener" href="https://www.baeldung.com/role-and-privilege-for-spring-security-registration">Spring Security - Roles and Privileges</a> 아티클 기반으로 내용을 정리해본다.</p>
+<h3 id="권한-설계-작업은-언제하는-것이-좋은가"><a href="#권한-설계-작업은-언제하는-것이-좋은가" class="headerlink" title="권한 설계 작업은 언제하는 것이 좋은가?"></a>권한 설계 작업은 언제하는 것이 좋은가?</h3><p>시스템에 따라 어떤 Role이 필요한지는 사용자 시나리오나 Persona 기반으로 도출할 수 있다.<br>하지만 어떤 권한이 필요한지 정의를 할때는 사용자 시나리오나 User Journey Map기반으로 진행하면, 상상을 기반으로 하기때문에 구체적인 상황을 고려하려 설계를 진행하기 어렵다.</p>
+<p><strong>개인적으로 권한(Privilege) 설계는 시스템이 어느 정도 개발이 되고 나서, 실물 기반으로 시스템 권한, 비지니스별 권한 설계하는 것이 구체적인 상황별로 생각을 확장해서 고민할 수 있어서 더 편했던 것 같다.</strong></p>
+<ul>
+<li>장점<ul>
+<li>눈에보이는 구체적인 상황을 기준으로 설계를 진행할 수 있어서 쉽게 작업할 수 있다.</li>
+<li><strong>설계를 실물 기반으로 검증할 수 있어서 불확실성을 줄이고, 불필요한 작업을 할 확률을 줄인다.</strong></li>
+</ul>
+</li>
+<li>단점<ul>
+<li>Role, 권한 설계가 소스, 테스트 포함해서 시스템 전반에 영향을 끼치기 때문에 작업 범위가 커서 시간이 오래 걸릴 수 있다.</li>
+<li>작업 시점이 너무 늦지 않는 것이 중요하다. 작업 시점이 너무 늦으면 권한 설계로 인해 소스가 변경되야 하는 상황이 생기는데, 영향도가 크면 적용하기가 점점 어려워진다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="a-Role"><a href="#a-Role" class="headerlink" title="a. Role"></a>a. Role</h3><p>Role은 시스템에서 사용하는 사용자의 역할을 의미한다. Role은 동시에 두 가지형태로 사용될 수 있다.</p>
+<ol>
+<li><strong>그 자체로 권한으로 사용할 수 있다.</strong></li>
+<li><strong>권한(Privilege)을 담는 Container로써 사용할 수 있다.</strong></li>
+</ol>
+<h3 id="b-권한-Privilege"><a href="#b-권한-Privilege" class="headerlink" title="b. 권한(Privilege)"></a>b. 권한(Privilege)</h3><p>시스템에서 사용하는 low-level의 권한을 의미한다. 앞에서 설명한 것처럼 Role은 권한을 담는 Container로써 역할을 수행할 수 있기 때문에, 권한 설계시에는 Role이 사용할 수 있는 모든 권한이 도출되어 있어야 한다.</p>
+<ul>
+<li>Role과 Privilege 의 관계 : 다대다(N:N)</li>
+<li>권한은 Role별로 그룹핑 되고 관리되는 대상이다. 논리적으로 권한(Privilege 또는 Authoritiy)이 Role보다 더 작고 세밀하다.</li>
+</ul>
+<img alt="Granularity(세밀함) - Role과 GrantedAuthority" src="/images/spring-security/authority_role_granularity.png" height="70%" width="70%">
+
+<h3 id="c-Role과-권한-Privilege-설계-예시"><a href="#c-Role과-권한-Privilege-설계-예시" class="headerlink" title="c. Role과 권한(Privilege) 설계 예시"></a>c. Role과 권한(Privilege) 설계 예시</h3><p>이전의 플젝 경험을 바탕으로, Role과 권한 관계를 어떻게 설계할 수 있는지 예를 들어 확인해보자.<br><strong>Role가 권한(Privilege)은 시스템 전반에 영향을 끼치는 high-level 범위에서 설계가 되어야 한다. 사업부 체크와 같은 비지니스별 권한 체크는 여기서 제외하며, 추후에 구체적으로 다루도록 하겠다.</strong> </p>
+<h4 id="“경영지표를-확인하는-대쉬보드-시스템”"><a href="#“경영지표를-확인하는-대쉬보드-시스템”" class="headerlink" title="“경영지표를 확인하는 대쉬보드 시스템”"></a><em>“경영지표를 확인하는 대쉬보드 시스템”</em></h4><p>실적을 조회하는 대쉬보드 형태의 시스템이었고, Role은 일반 사용자와 사용자 관리를 할 수 있는 어드민 사용자로 구분이 되었다.</p>
+<ul>
+<li>ROLE_USER (일반 사용자)<ul>
+<li>READ_AUTHORITY 만 가짐</li>
+</ul>
+</li>
+<li>ROLE_ADMIN (관리자)<ul>
+<li>WRITE_AUTHORITY : 사용자 관리, 메뉴 관리(등록, 수정, 삭제)</li>
+<li>READ_AUTHORITY</li>
+</ul>
+</li>
+</ul>
+<h4 id="“프로젝트의-공정-일감을-관리하는-시스템”"><a href="#“프로젝트의-공정-일감을-관리하는-시스템”" class="headerlink" title="“프로젝트의 공정, 일감을 관리하는 시스템”"></a><em>“프로젝트의 공정, 일감을 관리하는 시스템”</em></h4><p>누구나 사용을 할 수 있지만 회원가입을 한 최초 사용자는 “임시 사용자”로써 프로젝트 공지사항, 메일, 일정등 가장 기본적인 커뮤니케이션 기능만 사용할 수 있다.<br>프로젝트 관리자가 승인을 해주면, “일반 사용자”로 역할이 변경되면서 프로젝트에서 상세한 공정, 일감, 요구사항 관리들의 기능을 수행할 수 있다.<br>프로젝트의 어드민 관리 기능 (예. 메뉴, 사용자, 권한, 캘린더, 회의실)은 “관리자” 역할자만 변경이 가능했다. </p>
+<ul>
+<li>ROLE_TEMPORARY_USER (임시 사용자)<ul>
+<li>최초 회원가입하면 임시 사용자로써, 메일, 일정 관리등 커뮤니케이션 관련된 기능만 기본적으로 사용할 수 있음</li>
+<li>COMMUNICATION_AUTHORITY : 메일 관리, 일정 관리</li>
+</ul>
+</li>
+<li>ROLE_USER (일반 사용자)<ul>
+<li>관리자가 승인을 해주면, 일반 사용자로 변경이 되고 COMMUNICATION_AUTHORITY 외에 추가적으로 공정, 일감 관리 기능까지 수행 가능</li>
+<li>COMMUNICATION_AUTHORITY, WORK_AUTHORITY (공정 관리), TASK_AUTHORITY (일감 관리)</li>
+</ul>
+</li>
+<li>ROLE_ADMIN (관리자)<ul>
+<li>관리자의 경우, 프로젝트가 생성되면 프로젝트 관리자 계정이 자동으로 생성됨</li>
+<li>프로젝트 관리자 계정은 메뉴, 프로젝트 사용자, 권한 관리등 어드민성 기능을 수행할 수 있다.</li>
+<li>기본적으로는 일반 사용자의 권한을 사용할 수 있으며, 추가적으로 설정 관리까지 수행 가능하다.</li>
+<li>CONFIG_AUTHORITY (설정 관리 - 메뉴, 사용자 관리 등등)</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-Spring-Security-실습"><a href="#2-Spring-Security-실습" class="headerlink" title="2. Spring Security 실습"></a>2. Spring Security 실습</h2><p>이전에는 Role과 권한 설계방법에 대해서 알아보았다면, 이제는 Spring Security에서는 Role과 권한 적용을 위해서 어떤 클래스를 사용할 지 알아보자.<br>각 클래스별로 역할이 무엇인지 이해하고 있다면 구현하기 더 수월하다. </p>
+<ul>
+<li>빨간색으로 표시된 부분이 이번 실습과 연관된 클래스이다.</li>
+</ul>
+<p>실습 프로젝트의 구조와 실습과 관련된 클래스에 대해서 알아보자.<br>Role과 권한 설계 예시에서 <strong>“프로젝트의 공정, 일감을 관리하는 시스템”의 내용을 사용하여 Unit Test 기반으로 실습을 진행한다.</strong></p>
+<ul>
+<li>실습 프로젝트 Github 주소 : <a target="_blank" rel="noopener" href="https://github.com/gregor77/start-spring-security">https://github.com/gregor77/start-spring-security</a></li>
+<li>Spec : Java 8, Spring Boot, H2, Spring Web, Spring Data JPA, Lombok</li>
+<li>목표 : <strong>Role과 권한 설계 내용을 바탕으로 Spring security에서 사용자의 Role과 권한(Previlege)을 UserDetailsService를 사용해서 조회하는 실습을 진행해보자.</strong></li>
+</ul>
+<h3 id="a-프로젝트-설정"><a href="#a-프로젝트-설정" class="headerlink" title="a. 프로젝트 설정"></a>a. 프로젝트 설정</h3><p>실습 프로젝트는 H2 DB를 사용하여 구동된다.</p>
+<ul>
+<li>resources&#x2F;db&#x2F;data.sql<ul>
+<li>어플리케이션 샘플 데이터(User, Role, Privilege)를 생성하는 insert 쿼리</li>
+<li>사용자 비밀번호는 bcrypt password encoder를 통해서 encoding 된 값이다.</li>
+</ul>
+</li>
+<li>resources&#x2F;db&#x2F;schema.sql<ul>
+<li>어플리케이션을 수행하는데 필요한 테이블 생성 쿼리</li>
+</ul>
+</li>
+<li>resources&#x2F;templates&#x2F;login.html<ul>
+<li>email과 password 기반의 로그인 화면</li>
+</ul>
+</li>
+</ul>
+<h3 id="b-User-Role-Privilege-Entity-객체"><a href="#b-User-Role-Privilege-Entity-객체" class="headerlink" title="b. User, Role, Privilege Entity 객체"></a>b. User, Role, Privilege Entity 객체</h3><ul>
+<li>User<ul>
+<li>사용자 정보를 포함하는 entity 객체로 UserDetails의 구현체이다.</li>
+<li>User와 Role은 N:N 관계이다.</li>
+</ul>
+</li>
+<li>Role<ul>
+<li>시스템에서 관리하는 Role 정보를 저장하는 entity 객체</li>
+<li>Role은 Privilege의 컨테이너로써 역할을 수행하기 때문에 하나의 Role은 여러 개의 권한을 포함한다. </li>
+<li>Role과 Privilege의 관계는 N:N 관계이다.</li>
+<li><strong>Role과 Privilege는 “role_privilege” 매핑 테이블을 통해서 관리된다.</strong></li>
+</ul>
+</li>
+<li>Privilege<ul>
+<li>시스템에서 관리하는 권한 정보를 저장하는 entity 객체</li>
+<li>Role과 Privilege의 관계는 N:N 관계이다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-UserDetails"><a href="#c-UserDetails" class="headerlink" title="c. UserDetails"></a>c. UserDetails</h3><ul>
+<li>인증된 핵심 사용자 정보 (권한, 비밀번호, 사용자명, 각종 상태)를 제공하기 위한 interface이다.</li>
+<li>기존에 만들어진 시스템에 존재하는 User 클래스가 UserDetails의 구현체가 되면 된다.</li>
+<li>추가적으로 시스템에서 사용자 관리 시나리오에 따라 isAccountNonExpired, isAccountNonLocked, isCredentialsNonExpired, isEnabled 구현하면 된다.<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Builder</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@NoArgsConstructor</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">implements</span> <span class="title class_">UserDetails</span> &#123;</span><br><span class="line">    <span class="meta">@Id</span></span><br><span class="line">    <span class="meta">@GeneratedValue(strategy = GenerationType.AUTO)</span></span><br><span class="line">    <span class="keyword">private</span> Long id;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column</span></span><br><span class="line">    <span class="keyword">private</span> String email;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column</span></span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column</span></span><br><span class="line">    <span class="keyword">private</span> String phoneNumber;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transient</span></span><br><span class="line">    <span class="keyword">private</span> Collection&lt;SimpleGrantedAuthority&gt; authorities;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ManyToMany(fetch = FetchType.EAGER)</span></span><br><span class="line">    <span class="meta">@JoinTable(</span></span><br><span class="line"><span class="meta">            name = &quot;user_role&quot;,</span></span><br><span class="line"><span class="meta">            joinColumns = @JoinColumn(name = &quot;user_id&quot;, referencedColumnName = &quot;id&quot;),</span></span><br><span class="line"><span class="meta">            inverseJoinColumns = @JoinColumn(name = &quot;role_id&quot;, referencedColumnName = &quot;id&quot;)</span></span><br><span class="line"><span class="meta">    )</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;Role&gt; roles;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Collection&lt;? <span class="keyword">extends</span> <span class="title class_">GrantedAuthority</span>&gt; getAuthorities() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.authorities;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getUsername</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isAccountNonExpired</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isAccountNonLocked</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isCredentialsNonExpired</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isEnabled</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="d-UserDetailsService"><a href="#d-UserDetailsService" class="headerlink" title="d. UserDetailsService"></a>d. UserDetailsService</h3><ul>
+<li><strong>username을 가지고 사용자 정보를 조회하고 session에 저장될 사용자 주체 정보인 UserDetails를 반환하는 Interface다.</strong></li>
+<li>각 시스템에서는 커스터마이징을 위한 구현체 클래스를 생성해야 한다.</li>
+<li>[참고] loadUserByUsername()에서 파라미터명을 username이 아니라 email로 변경한 이유는?<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/gregor77/start-spring-security">샘플 프로젝트</a> 로그인 화면에서 email과 password로 로그인하기 때문에, username 파라미터에 email 값으로 호출된다.</li>
+<li>로그인 화면 이동은 샘플 프로젝트 실행 후, 브라우저에서 “<a target="_blank" rel="noopener" href="http://localhost:8080/login&quot;">http://localhost:8080/login&quot;</a> 주소로 이동한다.</li>
+</ul>
+</li>
+</ul>
+<img alt="샘플 프로젝트 로그인 화면" src="/images/spring-security/02/login.png" height="50%" width="50%">
+  
+<ul>
+<li>loadUserByUsername()에서 하는 일<ul>
+<li>username을 가지고 사용자 정보를 조회</li>
+<li>사용자의 Role과 권한(Privilege)을 조회하여, SimpleGrantedAuthority 목록을 authorities에 세팅한다.</li>
+<li>Authentication 내부 principal 객체에 UserDetails 객체가 저장된다.</li>
+<li>Authentication 내부 authorities 객체에 사용자의 Role과 권한(Privilege) 정보가 저장된다.</li>
+<li><strong>UserDetails에 authorities가 세팅되어 있어야, API별 role이나 권한 체크를 진행할 수 있다.</strong></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomUserDetailsService</span> <span class="keyword">implements</span> <span class="title class_">UserDetailsService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> UserService userService;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">CustomUserDetailsService</span><span class="params">(UserService userService)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.userService = userService;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> UserDetails <span class="title function_">loadUserByUsername</span><span class="params">(String email)</span> <span class="keyword">throws</span> UsernameNotFoundException &#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userService.getUser(email)</span><br><span class="line">                .orElseThrow(() -&gt; <span class="keyword">new</span> <span class="title class_">UsernameNotFoundException</span>(<span class="string">&quot;User is not found. email=&quot;</span> + email));</span><br><span class="line"></span><br><span class="line">        user.setAuthorities(</span><br><span class="line">                Stream.concat(</span><br><span class="line">                        getRoles(user.getRoles()).stream(),</span><br><span class="line">                        getPrivileges(user.getRoles()).stream()</span><br><span class="line">                ).collect(Collectors.toList())</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> user;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;SimpleGrantedAuthority&gt; <span class="title function_">getRoles</span><span class="params">(List&lt;Role&gt; roles)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> roles.stream()</span><br><span class="line">                .map(Role::getName)</span><br><span class="line">                .map(SimpleGrantedAuthority::<span class="keyword">new</span>)</span><br><span class="line">                .collect(Collectors.toList());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;SimpleGrantedAuthority&gt; <span class="title function_">getPrivileges</span><span class="params">(List&lt;Role&gt; roles)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> roles.stream()</span><br><span class="line">                .flatMap(role -&gt; role.getPrivileges().stream())</span><br><span class="line">                .map(privilege -&gt; <span class="keyword">new</span> <span class="title class_">SimpleGrantedAuthority</span>(privilege.getName()))</span><br><span class="line">                .collect(Collectors.toList());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="e-GrantedAuthority"><a href="#e-GrantedAuthority" class="headerlink" title="e. GrantedAuthority"></a>e. GrantedAuthority</h3><ul>
+<li><strong>GrantedAuthority는 ID, Password 기반 인증에서 UserDetailsService를 통해서 조회된다.</strong></li>
+<li><strong>high-level authority라고 부르는 이유는, 어플리케이션 전반에 걸친 권한이기 때문이다. 따라서 특정 도메인에 특화된 권한을 의미하지는 않는다.</strong><ul>
+<li>즉, 시스템 레벨에서 필요한 권한이라고 생각하자.</li>
+<li>만약 specific한 수 천개의 role을 가지고 있었다면, 빠르게 메모리를 사용했을 뿐만 아니라, 사용자 인증을 하는데 많은 시간이 걸렸을 것이다.</li>
+</ul>
+</li>
+<li>도메인 별로 구체적인 권한 체크가 필요한 경우에는, GrantedAuthority로 관리하지 않고, 각 API 별로 비지니스 권한을 체크한다. </li>
+<li>@PreAuthorize나 @Secured 어노테이션을 사용하여 API나 서비스별로 시스템 권한 체크는 할 수 있다.</li>
+<li>Authentication 클래스에 getAuthorities() 메소드를 통하여, 인증받은 사용자의 authorities를 조회할 수 있다.<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Authentication 클래스</span></span><br><span class="line">Collection&lt;? <span class="keyword">extends</span> <span class="title class_">GrantedAuthority</span>&gt; getAuthorities()</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="f-SecurityContextHolder"><a href="#f-SecurityContextHolder" class="headerlink" title="f. SecurityContextHolder"></a>f. SecurityContextHolder</h3><ul>
+<li>SecurityContext를 보관하는 저장소</li>
+<li>SecurityContext에는 Authentication 인스턴스가 저장된다. </li>
+<li>Authentication에는 principal, credentials, authorities가 저장된다.</li>
+</ul>
+<h3 id="g-CustomUserDetailsServiceTest"><a href="#g-CustomUserDetailsServiceTest" class="headerlink" title="g. CustomUserDetailsServiceTest"></a>g. CustomUserDetailsServiceTest</h3><p>spring test context를 띄워서 샘플 데이터를 대상으로 UserDetailsService가 잘 동작하는지 unit test를 수행한다.<br><strong>각 사용자별로 Role, 권한(Privilege)가 잘 조회되는지 결과값을 확인하는 Assertion 테스트로 작성하였다.</strong></p>
+<ul>
+<li>Role 설명<ul>
+<li>임시 사용자, 일반 사용자, 어드민 사용자 Role로 구성된다.</li>
+<li>피라미드로 생각하면, 아래서부터 위로 임시 사용자 &lt; 일반 사용자 &lt; 관리자 순이다.</li>
+<li>일반 사용자는 임시 사용자 role도 가지기 때문에, 임시 사용자의 권한도 모두 포함한다.</li>
+<li>관리자는 임시 사용자, 일반 사용자 role을 모두 가지기 때문에, 모든 권한을 가진다.</li>
+</ul>
+</li>
+</ul>
+<p>각 사용자별 테스트 검증 내용은 다음과 같다.</p>
+<ul>
+<li>user1<ul>
+<li>임시 사용자(ROLE_TEMPORARY_USER)로써, 의사소통 권한(COMMUNICATION_AUTHORITY)을 가지고 있는지 확인한다.</li>
+</ul>
+</li>
+<li>user2<ul>
+<li>일반 사용자(ROLE_USER)로써 임시 사용자(ROLE_TEMPORARY_USER) Role도 가진다.</li>
+<li>의사소통 권한(COMMUNICATION_AUTHORITY),  공정 관리(WORK_AUTHORITY), 일감 관리(TASK_AUTHORITY) 권한을 가진다.</li>
+</ul>
+</li>
+<li>admin<ul>
+<li>관리자 (ROLE_ADMIN)로써, 일반 사용자, 임시 사용자 Role을 모두 가진다.</li>
+<li>따라서 설정관리 권한(CONFIG_AUTHORITY)을 포함해서 모든 권한을 가진다.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ExtendWith(SpringExtension.class)</span></span><br><span class="line"><span class="meta">@SpringBootTest(classes = StartSecurityApplication.class)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CustomUserDetailsServiceTest</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">USER1_EMAIL</span> <span class="operator">=</span> <span class="string">&quot;user1@gmail.com&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">USER2_EMAIL</span> <span class="operator">=</span> <span class="string">&quot;user2@gmail.com&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">ADMIN_EMAIL</span> <span class="operator">=</span> <span class="string">&quot;admin@gmail.com&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> CustomUserDetailsService userDetailsService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Nested</span></span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">loadUserByUsername</span> &#123;</span><br><span class="line">        <span class="meta">@Test</span></span><br><span class="line">        <span class="meta">@DisplayName(&quot;throw UsernameNotFoundException when user not found with email&quot;)</span></span><br><span class="line">        <span class="keyword">void</span> <span class="title function_">errorCase</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="type">UsernameNotFoundException</span> <span class="variable">error</span> <span class="operator">=</span> assertThrows(UsernameNotFoundException.class,</span><br><span class="line">                    () -&gt; userDetailsService.loadUserByUsername(<span class="string">&quot;not-found@gmail.com&quot;</span>));</span><br><span class="line"></span><br><span class="line">            assertThat(error.getMessage()).isEqualTo(<span class="string">&quot;User is not found. email=not-found@gmail.com&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Test</span></span><br><span class="line">        <span class="meta">@DisplayName(&quot;given user1 is temporary user, when get role, then has temporary_user role and communication authority&quot;)</span></span><br><span class="line">        <span class="keyword">void</span> <span class="title function_">checkAuthorityAsTemporaryUser</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="type">UserDetails</span> <span class="variable">user1</span> <span class="operator">=</span> userDetailsService.loadUserByUsername(USER1_EMAIL);</span><br><span class="line"></span><br><span class="line">            assertThat(user1.getAuthorities())</span><br><span class="line">                    .extracting(GrantedAuthority::getAuthority)</span><br><span class="line">                    .contains(<span class="string">&quot;ROLE_TEMPORARY_USER&quot;</span>, <span class="string">&quot;COMMUNICATION_AUTHORITY&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Test</span></span><br><span class="line">        <span class="meta">@DisplayName(&quot;given user2 is user, when get role, then has communication, user, temporary_user roles, and work, task authorities&quot;)</span></span><br><span class="line">        <span class="keyword">void</span> <span class="title function_">checkAuthorityAsUser</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="type">UserDetails</span> <span class="variable">user2</span> <span class="operator">=</span> userDetailsService.loadUserByUsername(USER2_EMAIL);</span><br><span class="line"></span><br><span class="line">            assertThat(user2.getAuthorities())</span><br><span class="line">                    .extracting(GrantedAuthority::getAuthority)</span><br><span class="line">                    .contains(<span class="string">&quot;ROLE_USER&quot;</span>, <span class="string">&quot;ROLE_TEMPORARY_USER&quot;</span>, <span class="string">&quot;COMMUNICATION_AUTHORITY&quot;</span>, <span class="string">&quot;WORK_AUTHORITY&quot;</span>, <span class="string">&quot;TASK_AUTHORITY&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Test</span></span><br><span class="line">        <span class="meta">@DisplayName(&quot;given admin is admin user, when get role, then has all of roles and authorities&quot;)</span></span><br><span class="line">        <span class="keyword">void</span> <span class="title function_">checkAuthorityAsAdminUser</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="type">UserDetails</span> <span class="variable">admin</span> <span class="operator">=</span> userDetailsService.loadUserByUsername(ADMIN_EMAIL);</span><br><span class="line"></span><br><span class="line">            assertThat(admin.getAuthorities())</span><br><span class="line">                    .extracting(GrantedAuthority::getAuthority)</span><br><span class="line">                    .contains(<span class="string">&quot;ROLE_ADMIN&quot;</span>, <span class="string">&quot;ROLE_USER&quot;</span>, <span class="string">&quot;ROLE_TEMPORARY_USER&quot;</span>, <span class="string">&quot;COMMUNICATION_AUTHORITY&quot;</span>, <span class="string">&quot;WORK_AUTHORITY&quot;</span>, <span class="string">&quot;TASK_AUTHORITY&quot;</span>, <span class="string">&quot;CONFIG_AUTHORITY&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="API-권한-테스트"><a href="#API-권한-테스트" class="headerlink" title="API 권한 테스트"></a>API 권한 테스트</h2><p><a target="_blank" rel="noopener" href="https://github.com/gregor77/start-spring-security">샘플 프로젝트</a>을 실행하여 로그인 후, <strong>관리자 권한 사용자(<a href="mailto:&#x61;&#x64;&#109;&#x69;&#110;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;">&#x61;&#x64;&#109;&#x69;&#110;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a>)로 로그인했을때만, 관리자 권한 API가 동작하는 것을 확인할 수 있다.</strong><br>테스트는 Postman을 사용해서 사용자 계정으로 로그인 후, 관리자 권한 API를 호출한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//UserController.java : 사용자 리소스 관리 Controller</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(value = &quot;/v1/user&quot;)</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserController</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> UserService userService;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">UserController</span><span class="params">(UserService userService)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.userService = userService;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(value = &quot;/&#123;id&#125;&quot;)</span></span><br><span class="line">    <span class="meta">@PreAuthorize(&quot;hasRole(&#x27;ADMIN&#x27;)&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> User <span class="title function_">getUser</span><span class="params">(<span class="meta">@PathVariable</span> <span class="type">long</span> id)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> userService.getUser(id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostMapping</span></span><br><span class="line">    <span class="meta">@PreAuthorize(&quot;hasRole(&#x27;ADMIN&#x27;)&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseStatus(value = HttpStatus.CREATED)</span></span><br><span class="line">    <span class="keyword">public</span> User <span class="title function_">createUser</span><span class="params">(<span class="meta">@RequestBody</span> User user)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!userService.getUser(user.getEmail()).isPresent()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;not found with email=&quot;</span> + user.getEmail());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> userService.createUser(user);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>API 권한체크 설명</p>
+<ul>
+<li>API에서 @PreAuthorize 어노테이션을 사용해서 Role 체크를 수행하고 있다.</li>
+<li><strong>@PreAuthorize 어노테이션 내부에서 “hasRole” security expression을 사용하여 관리자(ROLE_ADMIN) 권한을 체크하고 있다.</strong></li>
+<li><strong>hasRole 내부에서 defaultRolePrefix 가 “ROLE_”을 붙여서 검사하기 때문에, hasRole 문법의 인자에는 순수하게 Role명만 입력하면 된다.</strong></li>
+</ul>
+</li>
+<li><p>관리자 권한 API</p>
+<ul>
+<li>사용자 조회 API : GET, &#x2F;v1&#x2F;user&#x2F;{id} </li>
+<li>사용자 등록 API : POST, &#x2F;v1&#x2F;user</li>
+</ul>
+</li>
+<li><p>실패 사용자 계정</p>
+<ul>
+<li>임시 사용자 권한 : <a href="mailto:&#x75;&#115;&#101;&#114;&#x31;&#x40;&#x67;&#109;&#x61;&#x69;&#108;&#46;&#99;&#111;&#109;">&#x75;&#115;&#101;&#114;&#x31;&#x40;&#x67;&#109;&#x61;&#x69;&#108;&#46;&#99;&#111;&#109;</a> &#x2F; 1111</li>
+<li>일반 사용자 권한 : <a href="mailto:&#117;&#115;&#101;&#x72;&#50;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#111;&#109;">&#117;&#115;&#101;&#x72;&#50;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#111;&#109;</a> &#x2F; 2222</li>
+</ul>
+</li>
+<li><p>성공 사용자 계정</p>
+<ul>
+<li>관리자 권한 : <a href="mailto:&#97;&#100;&#109;&#x69;&#110;&#64;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#109;">&#97;&#100;&#109;&#x69;&#110;&#64;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#109;</a>  &#x2F; 3333</li>
+</ul>
+</li>
+</ul>
+<img alt="1. 어드민 계정 로그인" src="/images/spring-security/02/api-test-admin-login.png" height="70%" width="70%">
+<img alt="2. (성공) 어드민 권한 사용자 조회 API 테스트" src="/images/spring-security/02/api-test-admin-authority.png" height="70%" width="70%">
+<img alt="3. (실패) 일반사용자 권한 사용자 조회 API 테스트" src="/images/spring-security/02/api-test-not-authority.png" height="70%" width="70%">
+
+<h2 id="마무리"><a href="#마무리" class="headerlink" title="마무리"></a>마무리</h2><p>이번 시간에 인증된 사용자 정보를 가리키는 UserDetails 인터페이스와 사용자 정보를 조회하는 UserDetailsService를 구현해 보았다.<br>그리고 인증된 사용자 정보가 SecurityContext 내부에 Authentication 객체에 저장되는 것을 확인할 수 있었다.</p>
+<p>또한 사용자 인증 후, Authentication에 세팅된 authorities를 기반으로, @PreAuthorize 어노테이션에 선언된 API 권한 체크까지 정상적으로 동작하는 것을 확인할 수 있었다.</p>
+<p>마지막으로 이번 블로그 포스트를 통해서 아래 내용은 꼭 이해하고 갔으면 한다.</p>
+<ul>
+<li><strong>Spring security 아키텍쳐에서 UserDetails, UserDetailsService에 대한 역할</strong></li>
+<li><strong>시스템에서 사용하는 사용자의 Role과 권한(Previlege) 설계 방법</strong></li>
+<li>UserDetails에 Role과 권한(Previlege)을 GrantedAuthority로 세팅하는 방법</li>
+</ul>
+<h2 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/gregor77/start-spring-security">Rhyno Github 실습 Repository</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.baeldung.com/role-and-privilege-for-spring-security-registration">Spring Security - Roles and Privileges</a></li>
+<li><a href="https://gregor77.github.io/2021/04/19/spring-security-01/">Spring Security - 1. Authentication, SecurityContextHolder</a></li>
+</ul>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="http://gregor77.github.io/2021/04/21/spring-security-02/" data-id="clc4e92od003al8w4egbsaa2l" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "Rhyno park"
+        },
+        "headline": "Spring Security - 2. Role과 권한(Privilege)",
+        "image": "http://gregor77.github.io/images/spring-security/authority_role_granularity.png",
+        "keywords": "Spring Security Authentication UserDetailsService Role GrantedAuthority Privilege",
+        "genre": "Spring security",
+        "datePublished": "2021-04-21",
+        "dateCreated": "2021-04-21",
+        "dateModified": "2022-12-26",
+        "url": "http://gregor77.github.io/2021/04/21/spring-security-02/",
+        "description": "Role과 권한을 조회하는 UserDetailsService이번 시간에는 SecurityContext에 보관되는 Authentication, Role과 권한(Authority 또는 Privilege)에 대해 알아보겠다.경험을 바탕으로 Role과 권한의 차이는 무엇이고, 실습 예제로 어떻게 Spring Security에서 GrantedAuthority를 관리",
+        "wordCount": "3251",
+        "publisher": "Rhyno park",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http://gregor77.github.io/2021/04/21/spring-security-02/"
+        }
+    }
+</script>
+
+</article>
+
+    <section id="comments">
+    
+        
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
+    
+    </section>
+
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>follow:</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="linkedin" href="https://www.linkedin.com/in/sung-jin-park-376314103" target="_blank" rel="noopener">
+                        <i class="icon fa fa-linkedin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/gregor77?tab=repositories" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2021/05/18/spring-security-03/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">newer</strong>
+        <p class="article-nav-title">
+        
+            Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/2021/04/19/spring-security-01/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">older</strong>
+        <p class="article-nav-title">Spring Security - 1. Authentication, SecurityContextHolder</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">recents</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/jodit-editor/editor-image.png)" alt="Jodit Editor를 사용하여 게시판 만들기" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/React-FE/">React, FE</a></p>
+                            <p class="item-title"><a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="title">Jodit Editor를 사용하여 게시판 만들기</a></p>
+                            <p class="item-date"><time datetime="2022-12-26T06:07:42.000Z" itemprop="datePublished">2022-12-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/book-review-infra-engineer-book/인프라엔지니어의교과서.PNG)" alt="서평 - 인프라 엔지니어의 교과서" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Review/">Review</a></p>
+                            <p class="item-title"><a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="title">서평 - 인프라 엔지니어의 교과서</a></p>
+                            <p class="item-date"><time datetime="2021-06-11T00:39:56.000Z" itemprop="datePublished">2021-06-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/05/18/spring-security-03/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/03/spring-security-authentication-architecture-provider.png)" alt="Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/05/18/spring-security-03/" class="title">Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider</a></p>
+                            <p class="item-date"><time datetime="2021-05-18T06:37:17.000Z" itemprop="datePublished">2021-05-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/21/spring-security-02/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/authority_role_granularity.png)" alt="Spring Security - 2. Role과 권한(Privilege)" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/21/spring-security-02/" class="title">Spring Security - 2. Role과 권한(Privilege)</a></p>
+                            <p class="item-date"><time datetime="2021-04-21T07:40:17.000Z" itemprop="datePublished">2021-04-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/19/spring-security-01/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/securitycontextholder.png)" alt="Spring Security - 1. Authentication, SecurityContextHolder" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/19/spring-security-01/" class="title">Spring Security - 1. Authentication, SecurityContextHolder</a></p>
+                            <p class="item-date"><time datetime="2021-04-19T14:58:10.000Z" itemprop="datePublished">2021-04-19</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/React-FE/">React, FE</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-security/">Spring security</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a><span class="category-list-count">1</span></li></ul></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Authentication/" style="font-size: 20px;">Authentication</a> <a href="/tags/AuthenticationManager/" style="font-size: 10px;">AuthenticationManager</a> <a href="/tags/AuthenticationProvider/" style="font-size: 10px;">AuthenticationProvider</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C-%EC%96%B8%EC%96%B4/" style="font-size: 10px;">C 언어</a> <a href="/tags/Controller-Test/" style="font-size: 10px;">Controller Test</a> <a href="/tags/CountDownLatch/" style="font-size: 10px;">CountDownLatch</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Docker-%EC%8B%A4%EC%8A%B5/" style="font-size: 10px;">Docker 실습</a> <a href="/tags/Github-blog/" style="font-size: 10px;">Github blog</a> <a href="/tags/Google-Analytics/" style="font-size: 10px;">Google Analytics</a> <a href="/tags/Google-Search-Console/" style="font-size: 20px;">Google Search Console</a> <a href="/tags/GrantedAuthority/" style="font-size: 10px;">GrantedAuthority</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Hybrid-Test/" style="font-size: 10px;">Hybrid Test</a> <a href="/tags/JSON-LD/" style="font-size: 10px;">JSON-LD</a> <a href="/tags/Jodit-Editor/" style="font-size: 10px;">Jodit, Editor</a> <a href="/tags/Multi-Thread/" style="font-size: 10px;">Multi Thread</a> <a href="/tags/Privilege/" style="font-size: 10px;">Privilege</a> <a href="/tags/ProviderManager/" style="font-size: 10px;">ProviderManager</a> <a href="/tags/Role/" style="font-size: 10px;">Role</a> <a href="/tags/SEO/" style="font-size: 20px;">SEO</a> <a href="/tags/SW-Engineering/" style="font-size: 20px;">SW Engineering</a> <a href="/tags/Schema-org/" style="font-size: 10px;">Schema.org</a> <a href="/tags/SecurityContextHolder/" style="font-size: 10px;">SecurityContextHolder</a> <a href="/tags/Semantic-Web/" style="font-size: 10px;">Semantic Web</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Security/" style="font-size: 20px;">Spring Security</a> <a href="/tags/Spring-security/" style="font-size: 10px;">Spring security</a> <a href="/tags/TDD/" style="font-size: 20px;">TDD</a> <a href="/tags/Unit-Test/" style="font-size: 10px;">Unit Test</a> <a href="/tags/Unit-Test-Anti-Pattern/" style="font-size: 10px;">Unit Test Anti Pattern</a> <a href="/tags/Unit-test/" style="font-size: 20px;">Unit test</a> <a href="/tags/UserDetailsService/" style="font-size: 10px;">UserDetailsService</a> <a href="/tags/structure-data/" style="font-size: 10px;">structure data</a> <a href="/tags/%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84%EC%B5%9C%EC%A0%81%ED%99%94/" style="font-size: 10px;">검색엔진최적화</a> <a href="/tags/%EA%B5%AC%EC%A1%B0%ED%99%94%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0/" style="font-size: 10px;">구조화된 데이터</a> <a href="/tags/%EA%B8%B8%EB%B2%97/" style="font-size: 10px;">길벗</a> <a href="/tags/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%A4%ED%8C%A8/" style="font-size: 10px;">단위 테스트 실패</a> <a href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" style="font-size: 20px;">단위테스트</a> <a href="/tags/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D%EA%B3%BC-%EC%84%A4%EA%B3%84/" style="font-size: 10px;">요구사항 분석과 설계</a> <a href="/tags/%EC%9D%B8%EC%A6%9D-%EC%A0%88%EC%B0%A8/" style="font-size: 10px;">인증 절차</a> <a href="/tags/%EC%9D%B8%ED%94%84%EB%9D%BC-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98-%EA%B5%90%EA%B3%BC%EC%84%9C/" style="font-size: 10px;">인프라 엔지니어의 교과서</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://github.com/gregor77?tab=repositories">Rhyno Git Repository</a>
+                    </li>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/sung-jin-park-376314103">Rhyno LinkedIn</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/" class="logo"></a>
+                </h1>
+                <p>&copy; 2022 Rhyno park</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+        
+    
+    <script>
+    var disqus_shortname = 'hexo-theme-hueman';
+    
+    
+    var disqus_url = 'http://gregor77.github.io/2021/04/21/spring-security-02/';
+    
+    (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

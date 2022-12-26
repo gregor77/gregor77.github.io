@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    
+
+    
+    <title>Spring Security - 1. Authentication, SecurityContextHolder | Rhyno Tech Blog</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="Authentication,Spring security,SecurityContextHolder,Multi Thread,CountDownLatch,Unit Test" />
+    
+    <meta name="description" content="Authentication과 SecurityContextHolderSpring Security document를 보면서 SecurityContextHolder에 대해서 알아본다.Unit Test 기반으로 document에 설명되어 있는 내용을 직접 확인해보자.Spring Security 인증 모델에서 핵심은 SecurityContextHolder이다.  A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Security - 1. Authentication, SecurityContextHolder">
+<meta property="og:url" content="http://gregor77.github.io/2021/04/19/spring-security-01/index.html">
+<meta property="og:site_name" content="Rhyno Tech Blog">
+<meta property="og:description" content="Authentication과 SecurityContextHolderSpring Security document를 보면서 SecurityContextHolder에 대해서 알아본다.Unit Test 기반으로 document에 설명되어 있는 내용을 직접 확인해보자.Spring Security 인증 모델에서 핵심은 SecurityContextHolder이다.  A">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://gregor77.github.io/images/spring-security/securitycontextholder.png">
+<meta property="article:published_time" content="2021-04-19T14:58:10.000Z">
+<meta property="article:modified_time" content="2022-12-26T06:02:24.385Z">
+<meta property="article:author" content="Rhyno park">
+<meta property="article:tag" content="Authentication">
+<meta property="article:tag" content="Spring security">
+<meta property="article:tag" content="SecurityContextHolder">
+<meta property="article:tag" content="Multi Thread">
+<meta property="article:tag" content="CountDownLatch">
+<meta property="article:tag" content="Unit Test">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gregor77.github.io/images/spring-security/securitycontextholder.png">
+    
+
+    
+
+    
+        <link rel="icon" href="/css/images/favicons/favicon.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/titillium-web/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.css">
+
+
+    
+<script src="/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-145306283-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/rss2.xml" title="Rhyno Tech Blog" type="application/rss+xml">
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/" class="logo">Rhyno Tech Blog</a>
+                    </h1>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/">Home</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Blog/">Blog</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Docker/">Docker</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/React-FE/">React, FE</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Review/">Review</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Spring-security/">Spring security</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a></li></ul></li></ul>
+                                    
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/categories/Spring-security/">Spring security</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-spring-security-01" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        Spring Security - 1. Authentication, SecurityContextHolder
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/2021/04/19/spring-security-01/" class="article-date">
+            <time datetime="2021-04-19T14:58:10.000Z" itemprop="datePublished">2021-04-19</time>
+        </a>
+    </div>
+
+		        
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Authentication/" rel="tag">Authentication</a>, <a class="tag-link-link" href="/tags/CountDownLatch/" rel="tag">CountDownLatch</a>, <a class="tag-link-link" href="/tags/Multi-Thread/" rel="tag">Multi Thread</a>, <a class="tag-link-link" href="/tags/SecurityContextHolder/" rel="tag">SecurityContextHolder</a>, <a class="tag-link-link" href="/tags/Spring-security/" rel="tag">Spring security</a>, <a class="tag-link-link" href="/tags/Unit-Test/" rel="tag">Unit Test</a>
+    </div>
+
+            </div>
+        
+<!--        <div class="article-pv">-->
+<!--            <span class="sns-icon fa-eye">-->
+<!--                0-->
+<!--            </span>-->
+<!--        </div>-->
+        
+        <div class="article-entry" itemprop="articleBody">
+            <h1 id="Authentication과-SecurityContextHolder"><a href="#Authentication과-SecurityContextHolder" class="headerlink" title="Authentication과 SecurityContextHolder"></a>Authentication과 SecurityContextHolder</h1><p>Spring Security document를 보면서 SecurityContextHolder에 대해서 알아본다.<br>Unit Test 기반으로 document에 설명되어 있는 내용을 직접 확인해보자.<br>Spring Security 인증 모델에서 핵심은 <strong>SecurityContextHolder</strong>이다. </p>
+<h2 id="Authentication"><a href="#Authentication" class="headerlink" title="Authentication"></a>Authentication</h2><p><strong>Session에 저장되는 정보가 Authentication이라 생각하면 된다. Authentication은 역할에 따라서 principal, credentials, authorities, details로 구성된다.</strong><br>Authentication은 SecurityContextHolder 내부에 보관되는 SecurityContext에 저장된다.</p>
+<ul>
+<li>Principal<ul>
+<li>식별된 사용자 정보를 보관한다. UserDetails의 인스턴스이다.</li>
+<li>시스템에 따라 UserDetails 클래스를 상속하여, 커스텀한 형태로 유지할 수 있다.</li>
+</ul>
+</li>
+<li>Credentials<ul>
+<li>주체 (사용자)가 올바르다는 것을 증명하는 자격 증명이다.</li>
+<li>보통 비밀번호를 의미하며, AuthenticationManager와 관련된 항목일 수 있다.</li>
+</ul>
+</li>
+<li>Authorities<ul>
+<li>AuthenticationManager가 설정한 권한을 의미</li>
+<li>Authentication 상태에 영향을 주지 않거나 수정할 수 없는 인스턴스를 사용해야 한다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="SecurityContextHolder"><a href="#SecurityContextHolder" class="headerlink" title="SecurityContextHolder"></a>SecurityContextHolder</h2><p><img src="/images/spring-security/securitycontextholder.png" alt="spring security context holder"></p>
+<ul>
+<li>인증된 사용자의 구체적인 정보를 보관한다.</li>
+<li>Spring security는 SecurityContextHolder가 어떻게 만들어지는지에 대해서는 신경쓰지 않는다.</li>
+<li>만약 값을 포함하고 있다면, 현재 인증된 사용자 정보로 사용된다.</li>
+<li>사용자가 인증되었음을 나타내는 가장 간단한 방법은 SecurityContextHolder를 직접 설정하는 것이다.</li>
+</ul>
+<h3 id="Test-1-SecurityContextHolder-세팅-및-조회"><a href="#Test-1-SecurityContextHolder-세팅-및-조회" class="headerlink" title="Test 1. SecurityContextHolder 세팅 및 조회"></a>Test 1. SecurityContextHolder 세팅 및 조회</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@BeforeEach</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">setUp</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 멀티 쓰레드에서 ContextHolder에 인증된 사용자 정보 세팅시,</span></span><br><span class="line">    <span class="comment">// race condition 상태를 피하기 위해서 새로운 SecurityContext를 생성한다.</span></span><br><span class="line">    SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_THREADLOCAL);</span><br><span class="line">    setMockAuthentication(ANY_USER, ANY_PASSWORD, USER_ROLE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@DisplayName(&quot;SecurityContextHolder에 현재 인증된 사용자 정보를 세팅한다.&quot;)</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">securityContextHolder</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">Authentication</span> <span class="variable">authentication</span> <span class="operator">=</span> SecurityContextHolder.getContext().getAuthentication();</span><br><span class="line"></span><br><span class="line">    assertThat(authentication.isAuthenticated()).isTrue();</span><br><span class="line">    assertThat(authentication.getName()).isEqualTo(ANY_USER);</span><br><span class="line">    assertThat(authentication.getCredentials()).isEqualTo(ANY_PASSWORD);</span><br><span class="line">    assertThat(authentication.getAuthorities())</span><br><span class="line">            .extracting(GrantedAuthority::getAuthority)</span><br><span class="line">            .contains(USER_ROLE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setMockAuthentication</span><span class="params">(String principal, String credential, String role)</span> &#123;</span><br><span class="line">    <span class="type">SecurityContext</span> <span class="variable">context</span> <span class="operator">=</span> SecurityContextHolder.createEmptyContext();</span><br><span class="line"></span><br><span class="line">    <span class="type">Authentication</span> <span class="variable">mockAuthentication</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TestingAuthenticationToken</span>(principal, credential, role);</span><br><span class="line">    context.setAuthentication(mockAuthentication);</span><br><span class="line"></span><br><span class="line">    SecurityContextHolder.setContext(context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Test-2-Multi-Thread에서-SecurityContextHolder-조회"><a href="#Test-2-Multi-Thread에서-SecurityContextHolder-조회" class="headerlink" title="Test 2. Multi Thread에서 SecurityContextHolder 조회"></a>Test 2. Multi Thread에서 SecurityContextHolder 조회</h3><p>기본적으로 SecurityContextHolder는 <strong>ThreadLocal</strong>을 사용하여 인증된 사용자의 세부 정보를 저장한다.<br>SecurityContextHolder는 메소드에 인수로 명시적으로 전달되지 않더라도, 동일한 쓰레드의 메소드에서 사용할 수 있다.<br>현재 principal의 요청이 처리된 후, 쓰레드를 지우도록 주의를 기울일 경우, ThreadLocal 기반의 방식은 매우 안전하다.<br>Spring Security의 FilterChainProxy는 SecurityContextHolder가 항상 지우는 것을 보장한다. </p>
+<ul>
+<li>일부 어플리케이션은 쓰레드를 사용하는 특정 방식으로 인해, ThreadLocal을 사용하는데 완전히 적합하지 않다.</li>
+<li>예를들어 Swing 클라이언트는 JVM에 모든 쓰레드에서 같은 security context를 사용하기 원한다. </li>
+<li>SecurityContextHolder는 시작할 때 컨텍스트  저장 방법을 지정하는 전략으로 설정할 수 있다.</li>
+<li>Standalone한 어플리케이션의 경우, MODE_GLOBAL 전략을 사용하여 SecurityContextHolder를 사용할 수 있다.</li>
+</ul>
+<h4 id="Multi-Thread에서-exception-handling"><a href="#Multi-Thread에서-exception-handling" class="headerlink" title="Multi Thread에서 exception handling"></a>Multi Thread에서 exception handling</h4><p>Multi thread에서 발생한 exception은 thread 바깥에서 try..catch 블럭을 사용해서 exception 접근이 안된다.<br><strong>UncaughtExceptionHandler를 구현하여 thread에서 발생한 exception을 처리할 수 있다.</strong></p>
+<p>두 가지 방법으로 thread에서 발생한 exception을 처리할 수 있다.</p>
+<ol>
+<li>모든 Thread에서 발생하는 default Exception handler 지정</li>
+<li>Thread 별로 exception handler 지정</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SampleThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.run();</span><br><span class="line"></span><br><span class="line">        Optional.ofNullable(SecurityContextHolder.getContext())</span><br><span class="line">                .map(SecurityContext::getAuthentication)</span><br><span class="line">                .orElseThrow(() -&gt; <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;Multi thread...authentication is null&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SampleExceptionHandler</span> <span class="keyword">implements</span> <span class="title class_">Thread</span>.UncaughtExceptionHandler &#123;</span><br><span class="line">    <span class="keyword">private</span> String handlerName;</span><br><span class="line">    <span class="keyword">private</span> Runnable errorHandler;</span><br><span class="line">    <span class="keyword">private</span> CountDownLatch latch;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SampleExceptionHandler</span><span class="params">(String handlerName, Runnable errorHandler)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.handlerName = handlerName;</span><br><span class="line">        <span class="built_in">this</span>.errorHandler = errorHandler;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SampleExceptionHandler</span><span class="params">(String handlerName, Runnable errorHandler, CountDownLatch latch)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.handlerName = handlerName;</span><br><span class="line">        <span class="built_in">this</span>.errorHandler = errorHandler;</span><br><span class="line">        <span class="built_in">this</span>.latch = latch;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">uncaughtException</span><span class="params">(Thread t, Throwable e)</span> &#123;</span><br><span class="line">        System.out.println(<span class="built_in">this</span>.handlerName + <span class="string">&quot; : &quot;</span> + e.getMessage());</span><br><span class="line">        <span class="built_in">this</span>.errorHandler.run();</span><br><span class="line">        latch.countDown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@DisplayName(&quot;try...catch 블록으로 thread 외부에서 exception을 핸들링 할 수 없다.&quot;)</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">errorCase</span><span class="params">()</span> &#123;</span><br><span class="line">    Stream.of(<span class="keyword">new</span> <span class="title class_">SampleThread</span>(), <span class="keyword">new</span> <span class="title class_">SampleThread</span>())</span><br><span class="line">            .forEach(thread -&gt; &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    thread.start();</span><br><span class="line">                    assertThat(<span class="literal">true</span>).isTrue();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    Assertions.fail(<span class="string">&quot;try...catch 블록으로 thread exception 핸들링 할 수 없다.&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Multi-Thread에서-검증을-위한-Unit-Test-작성-계획"><a href="#Multi-Thread에서-검증을-위한-Unit-Test-작성-계획" class="headerlink" title="Multi Thread에서 검증을 위한 Unit Test 작성 계획"></a>Multi Thread에서 검증을 위한 Unit Test 작성 계획</h4><p>Thread가 종료되고 나서, 각각의 exception handler가 호출되었는지 확인한다.</p>
+<ul>
+<li><strong>Thread가 종료될때까지 기다리기 위해서 CountDownLatch를 thread 갯수만큼 선언했다.</strong></li>
+<li>exception Handler에서 에러를 처리하고 나서, latch.countDown() 호출하여, 갯수를 줄여준다.</li>
+<li>latch.await()를 사용하여 latch count가 0이 될때까지 기다린다.</li>
+<li>그 이후에 verify를 통해서, exception handler가 호출되었는지 확인한다.</li>
+</ul>
+<h4 id="1-default-exception-handler-지정"><a href="#1-default-exception-handler-지정" class="headerlink" title="1. default exception handler 지정"></a>1. default exception handler 지정</h4><p>모든 Thread에 적용되는 default exception handler를 지정할 수 있다.</p>
+<ul>
+<li>Thread를 2개를 사용하기 때문에, verify 테스트시에 defaultExceptionHandler가 2번 호출되었는지 확인한다.<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@DisplayName(&quot;Multi Thread 에러 핸들링 - default thread exception handler 지정&quot;)</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">withDefaultExceptionHandler</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">    <span class="type">CountDownLatch</span> <span class="variable">latch</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">2</span>);</span><br><span class="line">    <span class="type">Runnable</span> <span class="variable">defaultErrorHandler</span> <span class="operator">=</span> mock(Runnable.class);</span><br><span class="line">    Thread.setDefaultUncaughtExceptionHandler(<span class="keyword">new</span> <span class="title class_">SampleExceptionHandler</span>(<span class="string">&quot;defaultHandler&quot;</span>, defaultErrorHandler, latch));</span><br><span class="line"></span><br><span class="line">    Stream.of(<span class="keyword">new</span> <span class="title class_">SampleThread</span>(), <span class="keyword">new</span> <span class="title class_">SampleThread</span>()).forEach(SampleThread::start);</span><br><span class="line">    latch.await();</span><br><span class="line"></span><br><span class="line">    then(defaultErrorHandler).should(times(<span class="number">2</span>)).run();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-Thread-별로-exception-handler-지정"><a href="#2-Thread-별로-exception-handler-지정" class="headerlink" title="2. Thread 별로 exception handler 지정"></a>2. Thread 별로 exception handler 지정</h4><p>Thread 별로 각각의 exception handler 지정할 수 있다.</p>
+<ul>
+<li>각 Thread별로 exceptionHandler를 지정했다.</li>
+<li>Thread가 종료 후에 각각의 exceptionHandler가 한번씩 호출되었는지 확인한다.<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@DisplayName(&quot;Multi Thread 에러 핸들링 - thread마다 exception handler 지정&quot;)</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">withExceptionHandlerEachThread</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">    <span class="type">CountDownLatch</span> <span class="variable">latch</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">SampleThread</span> <span class="variable">firstThread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SampleThread</span>();</span><br><span class="line">    <span class="type">Runnable</span> <span class="variable">firstExceptionHandler</span> <span class="operator">=</span> mock(Runnable.class);</span><br><span class="line">    firstThread.setUncaughtExceptionHandler(<span class="keyword">new</span> <span class="title class_">SampleExceptionHandler</span>(<span class="string">&quot;firstHandler&quot;</span>, firstExceptionHandler, latch));</span><br><span class="line"></span><br><span class="line">    <span class="type">SampleThread</span> <span class="variable">secondThread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SampleThread</span>();</span><br><span class="line">    <span class="type">Runnable</span> <span class="variable">secondExceptionHandler</span> <span class="operator">=</span> mock(Runnable.class);</span><br><span class="line">    secondThread.setUncaughtExceptionHandler(<span class="keyword">new</span> <span class="title class_">SampleExceptionHandler</span>(<span class="string">&quot;secondHandler&quot;</span>, secondExceptionHandler, latch));</span><br><span class="line"></span><br><span class="line">    Stream.of(firstThread, secondThread).forEach(SampleThread::start);</span><br><span class="line">    latch.await();</span><br><span class="line"></span><br><span class="line">    then(firstExceptionHandler).should(times(<span class="number">1</span>)).run();</span><br><span class="line">    then(secondExceptionHandler).should(times(<span class="number">1</span>)).run();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="Multi-thread-환경에서-SecurityContextHolder의-전략-수정"><a href="#Multi-thread-환경에서-SecurityContextHolder의-전략-수정" class="headerlink" title="Multi thread 환경에서 SecurityContextHolder의 전략 수정"></a>Multi thread 환경에서 SecurityContextHolder의 전략 수정</h4><p>ThreadLocal기반의 ContextHolder를 사용시, Multi thread 환경에서는 기존 쓰레드에 담긴 내용을 동기화해주는 작업을 별도로<br>진행해야 한다. SecurityContextHolder의 경우는 세가지의 전략을 지원하고, Multi thread 환경에서 적절한 전략을 선택하면 된다.</p>
+<p><strong>Strategy 종류</strong></p>
+<ul>
+<li>MODE_THREADLOCAL : 기본 설정</li>
+<li>MODE_INHERITABLETHREADLOCAL : 멀티 쓰레드에서 새로운 안전한 쓰레드를 생성하는 경우에 기존 쓰레드와 동일하게 사용하고 싶은 경우</li>
+<li>MODE_GLOBAL : standalone application에서 사용</li>
+</ul>
+<p><strong>Unit Test 설명</strong></p>
+<ol>
+<li>SecurityContextHolder의 전략을 MODE_INHERITABLETHREADLOCAL로 지정</li>
+<li>mock 인증 정보 생성</li>
+<li>Multi thread 수행시, SecurityContextHolder에 기존 쓰레드에 지정된 authentication 정보가 새로운 thread에도 지속디는 것을 확인<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@DisplayName(&quot;SecurityContextHolder에서 threadLocal mode변경을 통해서, multi thread에서 동기화 가능&quot;)</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">withGlobalMode</span><span class="params">()</span> &#123;</span><br><span class="line">    SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);</span><br><span class="line">    setMockAuthentication(ANY_USER, ANY_PASSWORD, USER_ROLE);</span><br><span class="line"></span><br><span class="line">    <span class="type">Runnable</span> <span class="variable">defaultErrorHandler</span> <span class="operator">=</span> mock(Runnable.class);</span><br><span class="line">    Thread.setDefaultUncaughtExceptionHandler(<span class="keyword">new</span> <span class="title class_">SampleExceptionHandler</span>(<span class="string">&quot;defaultHandler&quot;</span>, defaultErrorHandler));</span><br><span class="line"></span><br><span class="line">    Stream.of(<span class="keyword">new</span> <span class="title class_">SampleThread</span>(), <span class="keyword">new</span> <span class="title class_">SampleThread</span>()).forEach(SampleThread::start);</span><br><span class="line"></span><br><span class="line">    then(defaultErrorHandler).should(never()).run();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="마무리"><a href="#마무리" class="headerlink" title="마무리"></a>마무리</h2><p><strong>SecurityContextHolder는 인증된 사용자 정보 저장소로써 역할을 수행한다.<br> 기본적으로 ThreadLocal 기반으로 사용하며, Multi thread 환경에서 기존 인증정보를 sync해서 사용하기 위해서는 strategy 수정이 필요하다.</strong></p>
+<ul>
+<li>메소드 호출시 인증정보를 파라미터로 전달받지 않더라도, SecurityContextHolder에 접근하면 인증된 사용자 정보 확인이 가능하다.</li>
+<li>물론 layer(Controller-Service-Repository)를 넘나들면서 SecurityContextHolder에 접근은 가능하지만, 인증정보를 session 이라고 생각한다면,<br>Presentation Layer의 역할인 Controller에만 SecurityContextHolder에 접근하고, 나머지 layer에서는 메소드 파라미터로 전달받는 것이 바람직해보인다.</li>
+</ul>
+<p><strong>Java 8에서 멀티 쓰레드에서 exception을 다루기 위한 방법</strong>에 대해서도 알아보았다.</p>
+<ul>
+<li>default uncaughtExceptionHandler를 사용하여 모든 쓰레드에 공통적으로 적용</li>
+<li>각 Thread별로 exception handler를 지정</li>
+<li>본문에서 테스트해보지는 않았지만 두 가지 방법을 혼용해서도 사용가능하다.</li>
+</ul>
+<p>마지막으로 Unit Test에서 Multi thread 상태가 종료될 때까지 assertion을 기다리기 위해서,<br><strong>java.util.concurrent.CountDownLatch</strong>를 사용하는 방법도 알아보았다. CountDownLatch를 사용하여 멀티 쓰레드 환경에서 테스트를 작성할 수 있었다.</p>
+<h2 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/gregor77/start-spring-security/blob/master/src/test/java/com/rhyno/startsecurity/authentication/SecurityContextHolderTest.java">Rhyno Git repository - SecurityContextHolder</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-authentication-securitycontextholder">Spring security document</a></li>
+<li><a target="_blank" rel="noopener" href="http://hochulshin.com/java-multithreading-thread-exception-handling/">Java8 multi thread exception handling</a></li>
+</ul>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="http://gregor77.github.io/2021/04/19/spring-security-01/" data-id="clc4e92ng000ql8w4b6lmfkuv" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "Rhyno park"
+        },
+        "headline": "Spring Security - 1. Authentication, SecurityContextHolder",
+        "image": "http://gregor77.github.io/images/spring-security/securitycontextholder.png",
+        "keywords": "Authentication Spring security SecurityContextHolder Multi Thread CountDownLatch Unit Test",
+        "genre": "Spring security",
+        "datePublished": "2021-04-19",
+        "dateCreated": "2021-04-19",
+        "dateModified": "2022-12-26",
+        "url": "http://gregor77.github.io/2021/04/19/spring-security-01/",
+        "description": "Authentication과 SecurityContextHolderSpring Security document를 보면서 SecurityContextHolder에 대해서 알아본다.Unit Test 기반으로 document에 설명되어 있는 내용을 직접 확인해보자.Spring Security 인증 모델에서 핵심은 SecurityContextHolder이다. 
+A",
+        "wordCount": "1726",
+        "publisher": "Rhyno park",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http://gregor77.github.io/2021/04/19/spring-security-01/"
+        }
+    }
+</script>
+
+</article>
+
+    <section id="comments">
+    
+        
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
+    
+    </section>
+
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>follow:</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="linkedin" href="https://www.linkedin.com/in/sung-jin-park-376314103" target="_blank" rel="noopener">
+                        <i class="icon fa fa-linkedin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/gregor77?tab=repositories" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2021/04/21/spring-security-02/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">newer</strong>
+        <p class="article-nav-title">
+        
+            Spring Security - 2. Role과 권한(Privilege)
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/2021/01/06/book-review-%EC%8B%A4%EC%A0%84%EB%8C%80%EB%B9%84C%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98%EC%9D%B8%ED%84%B0%EB%B7%B0/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">older</strong>
+        <p class="article-nav-title">서평 - 실전대비 C 알고리즘 인터뷰</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">recents</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/jodit-editor/editor-image.png)" alt="Jodit Editor를 사용하여 게시판 만들기" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/React-FE/">React, FE</a></p>
+                            <p class="item-title"><a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="title">Jodit Editor를 사용하여 게시판 만들기</a></p>
+                            <p class="item-date"><time datetime="2022-12-26T06:07:42.000Z" itemprop="datePublished">2022-12-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/book-review-infra-engineer-book/인프라엔지니어의교과서.PNG)" alt="서평 - 인프라 엔지니어의 교과서" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Review/">Review</a></p>
+                            <p class="item-title"><a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="title">서평 - 인프라 엔지니어의 교과서</a></p>
+                            <p class="item-date"><time datetime="2021-06-11T00:39:56.000Z" itemprop="datePublished">2021-06-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/05/18/spring-security-03/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/03/spring-security-authentication-architecture-provider.png)" alt="Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/05/18/spring-security-03/" class="title">Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider</a></p>
+                            <p class="item-date"><time datetime="2021-05-18T06:37:17.000Z" itemprop="datePublished">2021-05-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/21/spring-security-02/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/authority_role_granularity.png)" alt="Spring Security - 2. Role과 권한(Privilege)" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/21/spring-security-02/" class="title">Spring Security - 2. Role과 권한(Privilege)</a></p>
+                            <p class="item-date"><time datetime="2021-04-21T07:40:17.000Z" itemprop="datePublished">2021-04-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/19/spring-security-01/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/securitycontextholder.png)" alt="Spring Security - 1. Authentication, SecurityContextHolder" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/19/spring-security-01/" class="title">Spring Security - 1. Authentication, SecurityContextHolder</a></p>
+                            <p class="item-date"><time datetime="2021-04-19T14:58:10.000Z" itemprop="datePublished">2021-04-19</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/React-FE/">React, FE</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-security/">Spring security</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a><span class="category-list-count">1</span></li></ul></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Authentication/" style="font-size: 20px;">Authentication</a> <a href="/tags/AuthenticationManager/" style="font-size: 10px;">AuthenticationManager</a> <a href="/tags/AuthenticationProvider/" style="font-size: 10px;">AuthenticationProvider</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C-%EC%96%B8%EC%96%B4/" style="font-size: 10px;">C 언어</a> <a href="/tags/Controller-Test/" style="font-size: 10px;">Controller Test</a> <a href="/tags/CountDownLatch/" style="font-size: 10px;">CountDownLatch</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Docker-%EC%8B%A4%EC%8A%B5/" style="font-size: 10px;">Docker 실습</a> <a href="/tags/Github-blog/" style="font-size: 10px;">Github blog</a> <a href="/tags/Google-Analytics/" style="font-size: 10px;">Google Analytics</a> <a href="/tags/Google-Search-Console/" style="font-size: 20px;">Google Search Console</a> <a href="/tags/GrantedAuthority/" style="font-size: 10px;">GrantedAuthority</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Hybrid-Test/" style="font-size: 10px;">Hybrid Test</a> <a href="/tags/JSON-LD/" style="font-size: 10px;">JSON-LD</a> <a href="/tags/Jodit-Editor/" style="font-size: 10px;">Jodit, Editor</a> <a href="/tags/Multi-Thread/" style="font-size: 10px;">Multi Thread</a> <a href="/tags/Privilege/" style="font-size: 10px;">Privilege</a> <a href="/tags/ProviderManager/" style="font-size: 10px;">ProviderManager</a> <a href="/tags/Role/" style="font-size: 10px;">Role</a> <a href="/tags/SEO/" style="font-size: 20px;">SEO</a> <a href="/tags/SW-Engineering/" style="font-size: 20px;">SW Engineering</a> <a href="/tags/Schema-org/" style="font-size: 10px;">Schema.org</a> <a href="/tags/SecurityContextHolder/" style="font-size: 10px;">SecurityContextHolder</a> <a href="/tags/Semantic-Web/" style="font-size: 10px;">Semantic Web</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Security/" style="font-size: 20px;">Spring Security</a> <a href="/tags/Spring-security/" style="font-size: 10px;">Spring security</a> <a href="/tags/TDD/" style="font-size: 20px;">TDD</a> <a href="/tags/Unit-Test/" style="font-size: 10px;">Unit Test</a> <a href="/tags/Unit-Test-Anti-Pattern/" style="font-size: 10px;">Unit Test Anti Pattern</a> <a href="/tags/Unit-test/" style="font-size: 20px;">Unit test</a> <a href="/tags/UserDetailsService/" style="font-size: 10px;">UserDetailsService</a> <a href="/tags/structure-data/" style="font-size: 10px;">structure data</a> <a href="/tags/%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84%EC%B5%9C%EC%A0%81%ED%99%94/" style="font-size: 10px;">검색엔진최적화</a> <a href="/tags/%EA%B5%AC%EC%A1%B0%ED%99%94%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0/" style="font-size: 10px;">구조화된 데이터</a> <a href="/tags/%EA%B8%B8%EB%B2%97/" style="font-size: 10px;">길벗</a> <a href="/tags/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%A4%ED%8C%A8/" style="font-size: 10px;">단위 테스트 실패</a> <a href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" style="font-size: 20px;">단위테스트</a> <a href="/tags/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D%EA%B3%BC-%EC%84%A4%EA%B3%84/" style="font-size: 10px;">요구사항 분석과 설계</a> <a href="/tags/%EC%9D%B8%EC%A6%9D-%EC%A0%88%EC%B0%A8/" style="font-size: 10px;">인증 절차</a> <a href="/tags/%EC%9D%B8%ED%94%84%EB%9D%BC-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98-%EA%B5%90%EA%B3%BC%EC%84%9C/" style="font-size: 10px;">인프라 엔지니어의 교과서</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://github.com/gregor77?tab=repositories">Rhyno Git Repository</a>
+                    </li>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/sung-jin-park-376314103">Rhyno LinkedIn</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/" class="logo"></a>
+                </h1>
+                <p>&copy; 2022 Rhyno park</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+        
+    
+    <script>
+    var disqus_shortname = 'hexo-theme-hueman';
+    
+    
+    var disqus_url = 'http://gregor77.github.io/2021/04/19/spring-security-01/';
+    
+    (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

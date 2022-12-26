@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    
+
+    
+    <title>Unit Test (단위 테스트) 에 관한 생각 | Rhyno Tech Blog</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="Unit test,단위테스트,Unit Test Anti Pattern,TDD,단위 테스트 실패" />
+    
+    <meta name="description" content="지금 부서의 역할이 사내에서 제품을 가지고 있는 팀들과 협업을 하면서 기존에 문제를 해결하고 사용자 관점에서 더 가치있는 제품을 항상 딜리버리 가능한 상태로 만드는 것을 목표로 하고 있다.기존의 문제를 해결하는 방법으로 Agile의 Practice를 필요에 따라 활용하고 있으며, 특히 개발 Practice로는 TDD, Unit Test, Code Revie">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unit Test (단위 테스트) 에 관한 생각">
+<meta property="og:url" content="http://gregor77.github.io/2019/08/16/about-unit-test/index.html">
+<meta property="og:site_name" content="Rhyno Tech Blog">
+<meta property="og:description" content="지금 부서의 역할이 사내에서 제품을 가지고 있는 팀들과 협업을 하면서 기존에 문제를 해결하고 사용자 관점에서 더 가치있는 제품을 항상 딜리버리 가능한 상태로 만드는 것을 목표로 하고 있다.기존의 문제를 해결하는 방법으로 Agile의 Practice를 필요에 따라 활용하고 있으며, 특히 개발 Practice로는 TDD, Unit Test, Code Revie">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://gregor77.github.io/images/unit-test-anti-pattern/no-unit-test-task-cycle.png">
+<meta property="article:published_time" content="2019-08-16T02:27:10.000Z">
+<meta property="article:modified_time" content="2022-12-26T06:02:24.385Z">
+<meta property="article:author" content="Rhyno park">
+<meta property="article:tag" content="Unit test">
+<meta property="article:tag" content="단위테스트">
+<meta property="article:tag" content="Unit Test Anti Pattern">
+<meta property="article:tag" content="TDD">
+<meta property="article:tag" content="단위 테스트 실패">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gregor77.github.io/images/unit-test-anti-pattern/no-unit-test-task-cycle.png">
+    
+
+    
+
+    
+        <link rel="icon" href="/css/images/favicons/favicon.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/titillium-web/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.css">
+
+
+    
+<script src="/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-145306283-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/rss2.xml" title="Rhyno Tech Blog" type="application/rss+xml">
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/" class="logo">Rhyno Tech Blog</a>
+                    </h1>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/">Home</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Blog/">Blog</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Docker/">Docker</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/React-FE/">React, FE</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Review/">Review</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Spring-security/">Spring security</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a></li></ul></li></ul>
+                                    
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-about-unit-test" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        Unit Test (단위 테스트) 에 관한 생각
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/2019/08/16/about-unit-test/" class="article-date">
+            <time datetime="2019-08-16T02:27:10.000Z" itemprop="datePublished">2019-08-16</time>
+        </a>
+    </div>
+
+		        
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/TDD/" rel="tag">TDD</a>, <a class="tag-link-link" href="/tags/Unit-Test-Anti-Pattern/" rel="tag">Unit Test Anti Pattern</a>, <a class="tag-link-link" href="/tags/Unit-test/" rel="tag">Unit test</a>, <a class="tag-link-link" href="/tags/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%A4%ED%8C%A8/" rel="tag">단위 테스트 실패</a>, <a class="tag-link-link" href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" rel="tag">단위테스트</a>
+    </div>
+
+            </div>
+        
+<!--        <div class="article-pv">-->
+<!--            <span class="sns-icon fa-eye">-->
+<!--                0-->
+<!--            </span>-->
+<!--        </div>-->
+        
+        <div class="article-entry" itemprop="articleBody">
+            <p>지금 부서의 역할이 사내에서 제품을 가지고 있는 팀들과 협업을 하면서 기존에 문제를 해결하고 사용자 관점에서 더 가치있는 제품을 항상 딜리버리 가능한 상태로 만드는 것을 목표로 하고 있다.<br>기존의 문제를 해결하는 방법으로 Agile의 Practice를 필요에 따라 활용하고 있으며, 특히 개발 Practice로는 TDD, Unit Test, Code Review, Pair Programming, CI&#x2F;CD 자동화, Build Monitor 등의 프랙티스를 가져간다.</p>
+<p>개발자로서 프로젝트를 진행하면서 TDD까지 전파하는 것은 정말 어려운 일이고, TDD까지 가기전에 Unit Test 작성하는 것은 제1순위로 전파하려고 하는 편이다.<br>테스트케이스 작성하는 방법을 체득화하고 그 이후에 TDD까지 이어가려고 하는데, 개발하는 습관이나 사고방식이 함께 바껴져야 하기 때문에 TDD까지 팀에 체득화 시키는 것은 항상 쉽지 않았다.<br>TDD에 대해서는 할말이 너무 많지만, 이번 글은 Unit Test (단위 테스트)에 대해서 개인적인 글을 써보겠다.</p>
+<h2 id="단위-테스트-장점"><a href="#단위-테스트-장점" class="headerlink" title="단위 테스트 장점"></a>단위 테스트 장점</h2><p>테스트케이스를 꼼꼼하게 작성을 하면서 내가 변경한 부분이 어디에 영향을 끼치는지 쉽게 파악할 수 있었다. 그 덕에 안심하고 리팩토링을 할 수 있는 점이 가장 좋았다.<br>단위 테스트를 하지 않는다면 제대로 수정했는지 확인될때까지 로컬에서 확인을 했을 것이다. 만약 오류가 발생하면 디버깅을 통해서 확인하는 작업을 반복했을 것이다.</p>
+<p>이렇게 소요되는 시간을 포함해서 생각해본다면 “단위테스트 작성때문에 생산성이 떨어지는 것은 아니냐?” 라는 의문에 대해서 그래도 얻는 장점이 더 많다고 말할 수 있지 않을까 생각한다.</p>
+<p><img src="/images/unit-test-anti-pattern/no-unit-test-task-cycle.png" alt="# 단위 테스트가 없다면 어떻게 작업을 했을까?"></p>
+<p>단위 테스트 작성시 무엇이 좋았더냐?</p>
+<ul>
+<li>테스트케이스가 꼼꼼하게 작성되어 있다면, 개발과정 중에 미리 문제를 파악할 수 있다.</li>
+<li>코드변경시, 변경한 부분으로 인한 영향도를 쉽게 파악할 수 있다.</li>
+<li>코드 리팩토링을 안심하고 할 수 있다. 테스트케이스들은 내가 가입한 보험들 같다.</li>
+<li>테스트 자동화를 통해서 항상 딜리버리 가능한 제품을 만들 수 있다.</li>
+<li>새로운 입력이 팀에 합류했을때, 개발 스타일, 표준, 컨벤션등을 공유하기에 좋다. </li>
+<li>페어 프로그래밍을 할때, 테스트케이스 작성하고 개발하는 역할 핑퐁을 통해서 개발을 페어로 집중해서 진행할 수 있다.<ul>
+<li>TDD + Pair Programming을 한다면, 테스트케이스 작성한 사람의 설계를 공유하면서 소스 개발까지 이어질 수 있으므로 집중력있게 개발할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="테스트케이스에-대한-걱정"><a href="#테스트케이스에-대한-걱정" class="headerlink" title="테스트케이스에 대한 걱정"></a>테스트케이스에 대한 걱정</h2><p>기존에 단위 테스트를 작성하지 않는 개발자분들과 프로젝트를 할때, 공통적으로 듣는 질문이나 내용들이 있다. 그렇다면 질문에 대해서 하나씩 생각해보자.<br>아직 해보지 않았거나 어떻게 해야할지 모르기 때문에 생각보다 두려움이 더 커져서 시도하기 어려울 수도 있다. 하지만 그 방법을 알거나 조금씩 해결할 수 있다면 단위 테스트를 적용할 수 있을 것이다.</p>
+<h4 id="Q-기존에-레거시-코드는-어떻게-해야하나"><a href="#Q-기존에-레거시-코드는-어떻게-해야하나" class="headerlink" title="Q. 기존에 레거시 코드는 어떻게 해야하나?"></a>Q. 기존에 레거시 코드는 어떻게 해야하나?</h4><p>기존에 만들어진 코드에 모두 테스트 케이스를 만드는 것은 상당히 어렵다. 시간적인 여유가 팀원들이 함께 짤 수 있다면 시도를 해보는 것은 나쁘지 않다.<br>하지만 이미 만들어진 코드의 규모가 크면 열정만으로는 다 커버하기가 쉽지 않다. 게다가 테스트 작성하는 법을 잘 모르고 있다면 익숙해지기 전까지 시간이 오래 걸린다.<br>투자한 노력에 비해서 아직 커버해야하는 부분이 많이 남아있다는 것을 확인하는 순간 지칠수도 있다.</p>
+<ul>
+<li><strong>기존의 레거시 코드는 E2E 테스트로 커버한다.</strong></li>
+<li><strong>새로 개발하거나 변경하는 부분을 대상으로 단위 테스트를 시작하라.</strong></li>
+</ul>
+<p>그렇게 하면 시간은 오래걸릴 수 있지만, 점차적으로 단위 테스트를 늘려갈 수 있을 것이다. E2E 테스트또한 기능이 복잡하거나 중요한 기능부터 커버하기 시작하라. 그렇다면 효율적으로 단위테스트 적용이 가능할 것이다.</p>
+<h4 id="Q-소스를-변경할때마다-단위테스트가-실패하면-유지보수-하는데-시간이-들지-않나"><a href="#Q-소스를-변경할때마다-단위테스트가-실패하면-유지보수-하는데-시간이-들지-않나" class="headerlink" title="Q. 소스를 변경할때마다 단위테스트가 실패하면 유지보수 하는데 시간이 들지 않나?"></a>Q. 소스를 변경할때마다 단위테스트가 실패하면 유지보수 하는데 시간이 들지 않나?</h4><p>TDD(Test Driven Development, 테스트주도개발)의 라이프 사이클을 보면 테스트를 작성하고, 실패하는 것을 확인하고, 테스트가 통과하도록 고친다. 그이후에 리팩토링을 통해서 코드품질을 향상한다.<br>이 과정을 반복을 하는데, 추가요건이 생기거나 리팩토링을 통해서 소스가 변경되어 단위 테스트가 실패하면 이를 고치는 것은 자연스러운 과정이다.<br>물론 테스트를 유지보수하기 쉽게 작성하는 것이 중요하다. 어떻게 하면 유지보수하기 쉬운 테스트케이스를 작성할 수 있을까?</p>
+<ul>
+<li><p><strong>하나의 테스트에 하나의 기능만 검증하라.</strong></p>
+<ul>
+<li>SRP (Single Responsibility Principle, 단일책임의원칙)을 객체지향 개발에서 중요한 원칙으로 생각한다. 이는 테스트 작성에도 도움이 된다고 생각한다.</li>
+<li>이를 유의하면서 테스트케이스를 작성하면 테스트 케이스의 수직거리가 짧기 때문에 훨씬 간결해진다.</li>
+<li>하나의 테스트케이스에서 너무 많은 기능을 검증하려고 하면, 중간에 깨졌을때 어떤부분 때문에 깨졌는지 확인하는데 시간이 오래 걸리는 부작용을 낳는다.</li>
+</ul>
+</li>
+<li><p><strong>테스트케이스에서 반복되는 부분도 리팩토링을 하라.</strong></p>
+<ul>
+<li>테스트케이스를 짜다보면 반복되는 부분들이 발생한다.</li>
+<li>예를 들면 특정 상황을 만들기 위해서 반복해서 Mock객체에 Stub을 통해서 의도한 결과를 만드는 것이 필요한 경우, 부모클래스나 메소드로 분리하면 테스트 작성자는 테스트 짜는 것에만 집중할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/unit-test-anti-pattern/tdd-life-cycle.png" alt="# TDD life cycle"></p>
+<h4 id="Q-작성하는-방법을-잘-모르는데-러닝커브가-크지-않나"><a href="#Q-작성하는-방법을-잘-모르는데-러닝커브가-크지-않나" class="headerlink" title="Q. 작성하는 방법을 잘 모르는데 러닝커브가 크지 않나?"></a>Q. 작성하는 방법을 잘 모르는데 러닝커브가 크지 않나?</h4><p>초반에는 테스트케이스 작성하는 방법에 익숙하지 않기 때문에 분명히 시간이 든다. 테스트케이스 없이 개발할때 보다 시간이 더 오래 걸릴 것이다. 만약에 팀원들이아 리더가 코드 품질이나 테스트 케이스의 중요성에 대해서 인식하지 못하고 있다면 어떻게 해야할까?<br>사실 그런 상황속에서 개인의 노력과 희생으로 익숙해질때까지 버티는 것은 쉽지않다. </p>
+<p>최소한 같은 팀이라면 코드 품질과 테스트의 중요성은 공감하고 있어야 한다. 그래야 나중에라도 생산성이 떨어지는 것 아니냐 등의 볼멘소리가 나오지 않는다.<br>Agile로 일하는 방식을 전파할때도 팀뿐만 아니라 리더들에게도 일하는 방식이나 사고방식의 변화의 중요성을 공유하는 이유가 그것 때문이다.<br>테스트케이스 작성에 익숙해지면 그 이후부터는 대부분 비슷한 경우의 반복이 많으며, 테스트케이스 작성때문에 생산성이 떨어지는 상황은 크게 문제가 되지 않았다.</p>
+<ul>
+<li><strong>잘 작성된 테스트케이스는 사전과 같다.</strong> 나중에 기억이 잘 안나면 찾아보고 작성하면 된다.<ul>
+<li>단, 기존에 없었던 테스트를 작성해야 하는 상황에는 당연히 스파이킹 시간을 투자해야한다.</li>
+<li>테스트케이스 자체가 문서라고 생각해보라. 물론 문서라는 것이 한번 만들고나면 현행화가 하는데 노력이 많이 들기도 하지만, 한번 만들어 놓으면 필요할때 찾아볼 수 있다.</li>
+</ul>
+</li>
+<li>단위 테스트 작성에 익숙한 사람과 덜 익숙한 사람과 **페어프로그래밍(Pair Programming)**을 진행해보라.<ul>
+<li>처음에는 익숙한 사람이 리딩을 하고, 그 이후에는 역할을 바꿔보며 페어로 진행하면 집중한 시간에 러닝커브를 가장 효율적으로 줄일 수 있다.</li>
+<li>두 사람의 숙련도 차이가 너무 많이 나는 경우에는 차라리 교육으로 진행하는 것이 효율적이다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="도입하기"><a href="#도입하기" class="headerlink" title="도입하기"></a>도입하기</h2><p>단위테스트의 장점도 알았고, 경험해보지 못해서 생긴 두려움도 어떻게 극복할 수 있을지 이야기해보았다. 그렇다면 당장 어떻게 팀에 도입할 수 있을까?<br>일단 팀원 모두가 공통적으로 필요성을 공감해야 지속할 수 있다. 기존에 프로젝트에 어떤 불편한점이 있었고, 단위테스트를 도입함으로써 어떻게 해결할 수 있을지 공감하고, 필요성을 느끼는 상태에서 시작해야 오래갈 수 있다.<br>팀원에 한명이라도 부정적인 생각을 가지고 있다면, 그 사람은 테스트케이스 짜기를 앞으로도 꺼려해 누군가가 또 비는 곳을 채우는 상황들이 벌어질 수 있기 때문이다.<br>기존에 작성하지 않는 팀이 도입하기 위해서는 어떤 변화가 필요할까?</p>
+<ul>
+<li>PM은 테스트케이스 작성에 개발자들이 익숙해지기까지 팀의 Velocity가 당장 떨어질 수 있다는 것을 인지해야 한다.<ul>
+<li>팀의 Velocity가 올라올때 까지 얼마나 걸릴지 확인해야하고, 그것을 감안해 일의 우선순의를 정리할 수 있어야 한다.</li>
+<li>작성에 익숙해지면 그 이후부터는 개발하는 과정일 뿐이지 Velocity가 떨어지는 등의 일은 발생하지 않을 것이다.</li>
+</ul>
+</li>
+<li>테스트케이스 작성의 원칙, 범위, 작성방법을 정하고 시작한다.<ul>
+<li>개발자들마다 개발하는 스타일이 다 다를지라도, 소스의 유지보수를 위해서 표준, 코드 컨벤션 등의 스타일을 맞추는 작업을 진행한다.</li>
+<li>테스트케이스의 유지보수를 위해서 얼마나 간결하게 작성을 할 것인지 범위를 정하는 것과 어떤 assertion이나 matcher 도구 등을 사용할지 정하고 가야 작성법이 단순해지기 전에 유지보수하기 편하다.<br> (예: junit + hamcrest matcher vs assertJ)</li>
+<li>테스트케이스 작성법이나 원칙은 계속 개선해나가는 것이 좋다. 단 변경될때마다 팀원들과 적극적으로 공유해야 테스트케이스 작성법을 비슷한 수준으로 유지할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="단위테스트-작성원칙"><a href="#단위테스트-작성원칙" class="headerlink" title="단위테스트 작성원칙"></a>단위테스트 작성원칙</h2><blockquote>
+<h4 id="하나의-테스트케이스에-최소한의-기능만-검증하고-최대한-간결하게-짠다"><a href="#하나의-테스트케이스에-최소한의-기능만-검증하고-최대한-간결하게-짠다" class="headerlink" title="하나의 테스트케이스에 최소한의 기능만 검증하고, 최대한 간결하게 짠다."></a><strong>하나의 테스트케이스에 최소한의 기능만 검증하고, 최대한 간결하게 짠다.</strong></h4></blockquote>
+<ul>
+<li>테스트케이스가 많은 것은 큰 문제가 되지 않는다. IDE 툴을 사용하면 테스트케이스가 많은 것은 쉽게 찾을 수 있다.</li>
+<li>[안티패턴] Java를 예를들면, 클래스에서 하나의 메소드를 하나의 테스트케이스를 기준으로 작성하는 경우를 본적이 있다. 분기문이 있거나 exception을 발생하는 경우가 다 하나의 테스트케이스에 포함되어 있다면 유지보수가 너무 어렵다.</li>
+<li>소스를 변경해서 테스트케이스를 고치야 하는 경우, 테스트케이스를 이해하기위해서 시간을 많이 든다면 얼마나 비효율적인가? 유지보수하기 편하게 작성하는 것이 중요하다.</li>
+</ul>
+<blockquote>
+<h4 id="입력값에-대한-결과-값을-검증하는-방식으로-짜는-것이-기본이다"><a href="#입력값에-대한-결과-값을-검증하는-방식으로-짜는-것이-기본이다" class="headerlink" title="입력값에 대한 결과 값을 검증하는 방식으로 짜는 것이 기본이다."></a><strong>입력값에 대한 결과 값을 검증하는 방식으로 짜는 것이 기본이다.</strong></h4></blockquote>
+<ul>
+<li>입력값에 대한 결과값을 확인하는 방식으로 작성하면 소스가 변경되더라도 테스트케이스를 변경할 일이 훨씬 적다.</li>
+<li>테스트케이스를 작성하다보면 구현체에 의존하지 않는 테스트케이스를 작성해야 유지보수가 쉽다. 하지만 단위테스트는 Mock객체를 사용하고 때로는 Stubbing도 해야되기 때문에 어느정도 구현체에 의존적일 수 밖에 없다.<br>하지만 구현체에 의존적이지 않아야 유지보수 노력이 덜 든다.</li>
+<li>항상 옳은 방법은 아닐 수 있지만, 기본적으로는 입력 값대비 결과값을 검증하는 방식으로 테스트케이스를 작성한다고 생각하면 쉽다.</li>
+<li>Java에서 단위 테스트에서 Private이나 Static method에 stub을 하기 위해 PowerMock을 사용하는 경우가 있다. 물론 File 관련 테스트를 작성하는 경우에 PowerMock이 도움이 된다.<br>하지만 정말 복잡하거나 필요한 경우가 아니라면 PowerMock을 도입하는 것보다, 입력값에 대한 결과값을 확인하는 방식으로 작성하라.</li>
+</ul>
+<blockquote>
+<h4 id="불안한-부분이-없도록-개발하는-부분은-최대한-커버하라"><a href="#불안한-부분이-없도록-개발하는-부분은-최대한-커버하라" class="headerlink" title="불안한 부분이 없도록, 개발하는 부분은 최대한 커버하라."></a><strong>불안한 부분이 없도록, 개발하는 부분은 최대한 커버하라.</strong></h4></blockquote>
+<ul>
+<li>우리가 개발하는 부분은 최대한 꼼꼼하게 작성해야 테스트케이스의 효과를 최대한 얻을 수 있다. 촘촘한 그물로 물고기를 많이 잡을 수 있는 것과 비슷하다.</li>
+<li>커버리지는 꼼꼼하게 단위테스트를 작성하면 따라온다. 커버리지 수치 자체가 목적이 되어서는 안된다.</li>
+</ul>
+<blockquote>
+<h4 id="Third-Party-Library의-기능은-믿고-검증대상에서-제외하라"><a href="#Third-Party-Library의-기능은-믿고-검증대상에서-제외하라" class="headerlink" title="Third Party Library의 기능은 믿고, 검증대상에서 제외하라."></a><strong>Third Party Library의 기능은 믿고, 검증대상에서 제외하라.</strong></h4></blockquote>
+<ul>
+<li>효율적인 개발을 위해 적용한 라이브러리 또는 플러그인의 기능은 정상적으로 동작할거라 믿고 검증하지 않는다.</li>
+<li><strong>그럼에도 중요한 기능이고 테스트가 없어서 커버하지 못한다, Unit Test외에 Integration Test나 다른 테스트로 검증을 하는 것도 고려해본다.</strong></li>
+<li>예를들어, Spring에서 JPA, Mybatis 등을 사용하는데 Query의 기능을 검증하고 싶은 경우가 있다. 단위테스트를 위해 라이브러리 내부에서 동작하는 방식을 확인하면서 Mock객체로 바꾸고, Stub하는 과정은 상당히 괴롭다.<br>이런 경우 Embedded DB나 Test DB를 대상으로 Repository Test 또는 Integration Test를 하는 것이 효율적이다.</li>
+</ul>
+<p>단위테스트를 힘들게 드디어 팀에 도입했다. 시작이 반이라고는 하지만 이제부터가 진짜 중요하다. 어떻게 하면 힘들게 도입하게된 단위 테스트의 장점을 만끽하면서 지속할 수 있을까?<br>테스트케이스를 작성하면서 개발을 시작했는데, 코드의 변경이 없어서 테스트케이스를 왜 작성해야하는지 모르겠다고 한다. 그냥 일만 두배로 하는 기분이고 이게 어떤 장점이 있는지 모르겠다고 한다.<br>물론 기능이 동작하는 것이 가장 중요하지만, 한번 작성한 코드를 개선하는 노력없이 그대로 계속 둔다는 것은 충격적이다. </p>
+<h2 id="단위테스트를-지속하기-위한-방법"><a href="#단위테스트를-지속하기-위한-방법" class="headerlink" title="단위테스트를 지속하기 위한 방법"></a>단위테스트를 지속하기 위한 방법</h2><h4 id="Refactoring-x3D-지속하는-원동력"><a href="#Refactoring-x3D-지속하는-원동력" class="headerlink" title="Refactoring &#x3D; 지속하는 원동력"></a>Refactoring &#x3D; 지속하는 원동력</h4><p>개인적으로는 내가 작성한 코드가 되었던 내가 만드는 제품은 살아있는 생명체라 생각한다. 더 이상 관심을 두지않고, 그대로 둔다면 그냥 죽어있는 거다. 현실은 변경이 있을때마다 누더기처럼 덕지덕지 코드가 붙고, 그러다보니 기존에 만들어진 구조에서 최소한의 변경만 하려고 한다.<br>이런 상황을 포장해서 고급스럽게(?) 레거시 프로그램이기 때문에 어쩔 수 없다고 말하는 사람들을 만나면 복잡한 생각이 든다.</p>
+<p>리팩토링의 장점은 정말 크다고 생각한다. 내가 하고 있는 일, 내가 만드는 것들에 대해 가치를 불어넣어주는 중요한 행위라 생각한다. 리팩토링이 성공했다는 보장이 기존의 테스트케이스 통과이기 때문에, 꼼꼼한 테스트케이스가 있을수록 더 나은 코드로 개선할 수 있는 기회가 많다는 것이다.<br>그래서 기존에 테스트케이스 효과를 경험하지 못한분들과 페어를 할 때는 유저스토리를 하나하면 리팩토링을 하나하는 순으로 일을 하려한다. 우리가 만든 코드를 개선하면서 바로 작성한 테스트케이스가 효과가 있는 것을 경험하는 과정이 말보다 훨씬 공감하기 좋은 방법이었다.</p>
+<p><strong>리팩토링을 습관화하기 위한 좋은 방법은 페어프로그래밍이 있지만 현실적 여건상 하기 어려운 곳들도 있다. 그런 경우에는 코드리뷰를 적용해보라.</strong> 코드리뷰를 통해서 더 나은 코드를 눈으로 보고, 내가 만드는 코드들이 더 나은 모습으로 개선될 수 있다는 것을 알게되면 자연스레 어느 정도의 코드품질을 지키기위해 리팩토링을 하게된다.</p>
+<p><img src="https://ih0.redbubble.net/image.543237740.8590/flat,1000x1000,075,f.jpg" alt="# 리팩토링은 사랑입니다."></p>
+<h4 id="테스트-자동화"><a href="#테스트-자동화" class="headerlink" title="테스트 자동화"></a>테스트 자동화</h4><p>테스트 자동화는 딜리버리 가능한 제품을 만들기 위해서는 선택이 아니라 필수다. 테스트 커버리지 측정, Report 생성해주는 라이브러리들, Sonar, Build Monitor를 이용해서 눈으로 우리가 만들고 있는 제품의 상황을 확인할 수 있다.</p>
+<p>테스트케이스를 작성하는 목적보다 수치에 집착하는 것은 옳지 않다. <strong>빌드 모니터의 목적은 눈으로 문제를 바로 확인할 수 있기 때문에, 가장 빠르게 대처하기 위함이다.</strong> 특히 사람은 눈에 보이는 것들에 민감하게 반응한다. 코드 커버리지나 코드 스멜, 보안성 취약점 등이 눈으로 확인되면 개선을 하려고 한다.<br>그리고 한번 지켜지는 코드품질의 수준 이하로 내려가는 경우는 드물다.</p>
+<p><img src="/images/unit-test-anti-pattern/build-monitor.png" alt="# Build Monitor"><br><img src="/images/unit-test-anti-pattern/sonar.png" alt="# Sonar Coverage"></p>
+<h2 id="결론"><a href="#결론" class="headerlink" title="결론"></a>결론</h2><p>이번 글은 개인적으로 프로젝트에 단위 테스트를 전파했던 경험들에 기반한 내용으로 개인적인 경험에 기반한 내용이라 부족하거나, 혹시 잘못된 생각이 있을 수도 있습니다.</p>
+<p>처음에 단위테스트와 TDD를 프로젝트에서 하고 싶은데 방법을 몰라서 그만두게 된적이 몇번 있었다. 그 이후에 방법을 알고 싶어서 지금 부서에 와서 일을 하게 되었고, 이 글이 저와 비슷한 상황을 겪는 분들께 도움이 되었으면 합니다.<br>지금의 저는 부족하면 더 많은 테스트케이스를 짜려고 합니다. 단위테스트로 부족하다고 생각이 들면 다른 테스트를 통해서 커버할 수 있는 방법이 있는지 고민합니다. 서비스를 만들다보면 소스가 자주 변화는 경우도 많고, 오늘의 나는 어제의 내가 짠 소스를 보면서 이해못하는 순간이 많습니다.<br>그런 상황에서 믿을 것은 동료도 있지만 꼼꼼하게 작성한 테스트케이스가 큰 의지가 됩니다.</p>
+<p>사람은 한번 더 편안한 것을 알게되면 이전에 구린방식으로 돌아가긴 어렵습니다. 제게 단위테스트가 그랬습니다. 만약에 이 글을 읽고 궁금한 점이 있으시면 댓글로 남겨주시면 확인하는대로 답변드리겠습니다. </p>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="http://gregor77.github.io/2019/08/16/about-unit-test/" data-id="clc4e92n70001l8w46fc02wjx" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "Rhyno park"
+        },
+        "headline": "Unit Test (단위 테스트) 에 관한 생각",
+        "image": "http://gregor77.github.io/images/unit-test-anti-pattern/no-unit-test-task-cycle.png",
+        "keywords": "Unit test 단위테스트 Unit Test Anti Pattern TDD 단위 테스트 실패",
+        "genre": "Unit Test & TDD",
+        "datePublished": "2019-08-16",
+        "dateCreated": "2019-08-16",
+        "dateModified": "2022-12-26",
+        "url": "http://gregor77.github.io/2019/08/16/about-unit-test/",
+        "description": "지금 부서의 역할이 사내에서 제품을 가지고 있는 팀들과 협업을 하면서 기존에 문제를 해결하고 사용자 관점에서 더 가치있는 제품을 항상 딜리버리 가능한 상태로 만드는 것을 목표로 하고 있다.기존의 문제를 해결하는 방법으로 Agile의 Practice를 필요에 따라 활용하고 있으며, 특히 개발 Practice로는 TDD, Unit Test, Code Revie",
+        "wordCount": "1750",
+        "publisher": "Rhyno park",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http://gregor77.github.io/2019/08/16/about-unit-test/"
+        }
+    }
+</script>
+
+</article>
+
+    <section id="comments">
+    
+        
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
+    
+    </section>
+
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>follow:</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="linkedin" href="https://www.linkedin.com/in/sung-jin-park-376314103" target="_blank" rel="noopener">
+                        <i class="icon fa fa-linkedin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/gregor77?tab=repositories" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/08/19/hexo-hueman-unparsed-structured-data/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">newer</strong>
+        <p class="article-nav-title">
+        
+            Hexo Hueman Theme 블로그 - 파싱할 수 없는 구조화된 데이터
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/2019/08/13/spring-hybrid-test/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">older</strong>
+        <p class="article-nav-title">Spring - 내가 짜는 Controller Test가 Hybrid Test?</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">recents</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/jodit-editor/editor-image.png)" alt="Jodit Editor를 사용하여 게시판 만들기" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/React-FE/">React, FE</a></p>
+                            <p class="item-title"><a href="/2022/12/26/20221226-jodit-editor-spiking-md/" class="title">Jodit Editor를 사용하여 게시판 만들기</a></p>
+                            <p class="item-date"><time datetime="2022-12-26T06:07:42.000Z" itemprop="datePublished">2022-12-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/book-review-infra-engineer-book/인프라엔지니어의교과서.PNG)" alt="서평 - 인프라 엔지니어의 교과서" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Review/">Review</a></p>
+                            <p class="item-title"><a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="title">서평 - 인프라 엔지니어의 교과서</a></p>
+                            <p class="item-date"><time datetime="2021-06-11T00:39:56.000Z" itemprop="datePublished">2021-06-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/05/18/spring-security-03/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/03/spring-security-authentication-architecture-provider.png)" alt="Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/05/18/spring-security-03/" class="title">Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider</a></p>
+                            <p class="item-date"><time datetime="2021-05-18T06:37:17.000Z" itemprop="datePublished">2021-05-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/21/spring-security-02/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/authority_role_granularity.png)" alt="Spring Security - 2. Role과 권한(Privilege)" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/21/spring-security-02/" class="title">Spring Security - 2. Role과 권한(Privilege)</a></p>
+                            <p class="item-date"><time datetime="2021-04-21T07:40:17.000Z" itemprop="datePublished">2021-04-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/19/spring-security-01/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/securitycontextholder.png)" alt="Spring Security - 1. Authentication, SecurityContextHolder" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/04/19/spring-security-01/" class="title">Spring Security - 1. Authentication, SecurityContextHolder</a></p>
+                            <p class="item-date"><time datetime="2021-04-19T14:58:10.000Z" itemprop="datePublished">2021-04-19</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/React-FE/">React, FE</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-security/">Spring security</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a><span class="category-list-count">1</span></li></ul></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Authentication/" style="font-size: 20px;">Authentication</a> <a href="/tags/AuthenticationManager/" style="font-size: 10px;">AuthenticationManager</a> <a href="/tags/AuthenticationProvider/" style="font-size: 10px;">AuthenticationProvider</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C-%EC%96%B8%EC%96%B4/" style="font-size: 10px;">C 언어</a> <a href="/tags/Controller-Test/" style="font-size: 10px;">Controller Test</a> <a href="/tags/CountDownLatch/" style="font-size: 10px;">CountDownLatch</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Docker-%EC%8B%A4%EC%8A%B5/" style="font-size: 10px;">Docker 실습</a> <a href="/tags/Github-blog/" style="font-size: 10px;">Github blog</a> <a href="/tags/Google-Analytics/" style="font-size: 10px;">Google Analytics</a> <a href="/tags/Google-Search-Console/" style="font-size: 20px;">Google Search Console</a> <a href="/tags/GrantedAuthority/" style="font-size: 10px;">GrantedAuthority</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Hybrid-Test/" style="font-size: 10px;">Hybrid Test</a> <a href="/tags/JSON-LD/" style="font-size: 10px;">JSON-LD</a> <a href="/tags/Jodit-Editor/" style="font-size: 10px;">Jodit, Editor</a> <a href="/tags/Multi-Thread/" style="font-size: 10px;">Multi Thread</a> <a href="/tags/Privilege/" style="font-size: 10px;">Privilege</a> <a href="/tags/ProviderManager/" style="font-size: 10px;">ProviderManager</a> <a href="/tags/Role/" style="font-size: 10px;">Role</a> <a href="/tags/SEO/" style="font-size: 20px;">SEO</a> <a href="/tags/SW-Engineering/" style="font-size: 20px;">SW Engineering</a> <a href="/tags/Schema-org/" style="font-size: 10px;">Schema.org</a> <a href="/tags/SecurityContextHolder/" style="font-size: 10px;">SecurityContextHolder</a> <a href="/tags/Semantic-Web/" style="font-size: 10px;">Semantic Web</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Security/" style="font-size: 20px;">Spring Security</a> <a href="/tags/Spring-security/" style="font-size: 10px;">Spring security</a> <a href="/tags/TDD/" style="font-size: 20px;">TDD</a> <a href="/tags/Unit-Test/" style="font-size: 10px;">Unit Test</a> <a href="/tags/Unit-Test-Anti-Pattern/" style="font-size: 10px;">Unit Test Anti Pattern</a> <a href="/tags/Unit-test/" style="font-size: 20px;">Unit test</a> <a href="/tags/UserDetailsService/" style="font-size: 10px;">UserDetailsService</a> <a href="/tags/structure-data/" style="font-size: 10px;">structure data</a> <a href="/tags/%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84%EC%B5%9C%EC%A0%81%ED%99%94/" style="font-size: 10px;">검색엔진최적화</a> <a href="/tags/%EA%B5%AC%EC%A1%B0%ED%99%94%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0/" style="font-size: 10px;">구조화된 데이터</a> <a href="/tags/%EA%B8%B8%EB%B2%97/" style="font-size: 10px;">길벗</a> <a href="/tags/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%A4%ED%8C%A8/" style="font-size: 10px;">단위 테스트 실패</a> <a href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" style="font-size: 20px;">단위테스트</a> <a href="/tags/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D%EA%B3%BC-%EC%84%A4%EA%B3%84/" style="font-size: 10px;">요구사항 분석과 설계</a> <a href="/tags/%EC%9D%B8%EC%A6%9D-%EC%A0%88%EC%B0%A8/" style="font-size: 10px;">인증 절차</a> <a href="/tags/%EC%9D%B8%ED%94%84%EB%9D%BC-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98-%EA%B5%90%EA%B3%BC%EC%84%9C/" style="font-size: 10px;">인프라 엔지니어의 교과서</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://github.com/gregor77?tab=repositories">Rhyno Git Repository</a>
+                    </li>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/sung-jin-park-376314103">Rhyno LinkedIn</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/" class="logo"></a>
+                </h1>
+                <p>&copy; 2022 Rhyno park</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+        
+    
+    <script>
+    var disqus_shortname = 'hexo-theme-hueman';
+    
+    
+    var disqus_url = 'http://gregor77.github.io/2019/08/16/about-unit-test/';
+    
+    (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
