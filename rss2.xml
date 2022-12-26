@@ -9,13 +9,13 @@
     <atom:link href="http://gregor77.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>Rhyno Tech Blog about agile, TDD, unit test, web development</description>
-    <pubDate>Mon, 26 Dec 2022 14:04:52 GMT</pubDate>
+    <pubDate>Mon, 26 Dec 2022 15:10:02 GMT</pubDate>
     <generator>http://hexo.io/</generator>
     
     <item>
       <title>React에서 Jodit Editor를 사용하여 게시판 만들기</title>
-      <link>http://gregor77.github.io/2022/12/26/20221226-jodit-editor-spiking-md/</link>
-      <guid>http://gregor77.github.io/2022/12/26/20221226-jodit-editor-spiking-md/</guid>
+      <link>http://gregor77.github.io/2022/12/26/jodit-editor-spiking/</link>
+      <guid>http://gregor77.github.io/2022/12/26/jodit-editor-spiking/</guid>
       <pubDate>Mon, 26 Dec 2022 06:07:42 GMT</pubDate>
       
         
@@ -36,7 +36,7 @@
       <category domain="http://gregor77.github.io/tags/Jodit-Editor/">Jodit, Editor</category>
       
       
-      <comments>http://gregor77.github.io/2022/12/26/20221226-jodit-editor-spiking-md/#disqus_thread</comments>
+      <comments>http://gregor77.github.io/2022/12/26/jodit-editor-spiking/#disqus_thread</comments>
       
     </item>
     
