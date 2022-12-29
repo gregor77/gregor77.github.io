@@ -21,7 +21,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://gregor77.github.io/images/unit-test-frontend/atomic-design-flow.png">
 <meta property="article:published_time" content="2022-12-30T14:36:00.000Z">
-<meta property="article:modified_time" content="2022-12-29T22:51:30.035Z">
+<meta property="article:modified_time" content="2022-12-29T22:56:38.788Z">
 <meta property="article:author" content="Rhyno park">
 <meta property="article:tag" content="Unit test">
 <meta name="twitter:card" content="summary">
@@ -249,7 +249,7 @@ ga('send', 'pageview');
 <li>describe 함수를 사용하여, 테스트 검증 항목별로 그룹 분리를 통해서 가독성 높이고, 테스트 작성을 쉽게 만들 수 있다.<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 테스트 파일</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;render&#x27;</span>, <span class="function">() =&gt;</span> &#123;  <span class="comment">//데이터 로딩과 시각화</span></span><br><span class="line">    </span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;event&#x27;</span>, <span class="function">() =&gt;</span> &#123;   <span class="comment">//이벤트 처리와 presentation 로직</span></span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;method&#x27;</span>, <span class="function">() =&gt;</span> &#123;  <span class="comment">//비지니스 로직</span></span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;lifecycle&#x27;</span>, <span class="function">() =&gt;</span> &#123;  <span class="comment">//프론트엔드 프레임워크 lifecycle 관련</span></span><br><span class="line"></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
 </ul>
 <h2 id="Unit-Test를-지속하는-방법"><a href="#Unit-Test를-지속하는-방법" class="headerlink" title="Unit Test를 지속하는 방법"></a>Unit Test를 지속하는 방법</h2><p><strong>테스트 작성이 어느 정도 익숙해지면 패턴이 생긴다. 유사한 케이스들이 차곡 차곡 쌓이면, 테스트가 점점 쉬워진다.</strong> </p>
-<p>개발 초기에는 새로운 유형의 테스트 상황이 발생하면서 테스트 작성에 많은 시간이 들지만, 어느 정도 시간이 쌓이면 기법적인 부분들은 확보되기 때문에 쉽게 작성할 수 있다.<br>오히려 팀에서 쌓이는 테스트 노하우를 개발 팀원들과 어떻게 공유하고 확산할 수 있을지 방법을 고민하는 것이 중요해진다.</p>
+<p>개발 초기에는 새로운 유형의 테스트 상황이 발생하면서 테스트 작성에 많은 시간이 들지만, 어느 정도 시간이 쌓이면 기법적인 부분들은 확보되기 때문에 쉽게 작성할 수 있다. 오히려 팀에서 쌓이는 테스트 노하우를 개발 팀원들과 어떻게 공유하고 확산할 수 있을지 방법을 고민하는 것이 중요해진다.</p>
 <p>그럼에도 불구하고 개발자들이 ‘개발해야 하는 기능은 많은데 테스트를 작성하면 시간이 오래 걸려서, 시간이 부족하다.’라고 생각한다면..</p>
 <ul>
 <li>내부 Onboarding 교육을 통해서 테스트 작성 방법에 대한 이해를 높이고, 테스트에 익숙하게 하라. </li>
@@ -352,7 +352,7 @@ ga('send', 'pageview');
         "url": "http://gregor77.github.io/2022/12/30/unit-test-frontend/",
         "description": "해당 본문은 Things to Consider when Frontend Unit Testing 글 기반으로 개인적인 생각을 더하여 작성하였다.
 왜 Frontend에서 단위 테스트 작성을 더 어렵게 느낄까?기존에 단위 테스트를 작성하지 않던 개발자에게 단위 테스트 작성을 전파하다 보면 백엔드보다 프론트엔드에서 테스트 작성을 더 어려워하는 느낌이다. 물론 그 ",
-        "wordCount": "716",
+        "wordCount": "717",
         "publisher": "Rhyno park",
         "mainEntityOfPage": {
             "@type": "WebPage",
