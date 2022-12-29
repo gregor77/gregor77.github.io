@@ -21,7 +21,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://gregor77.github.io/images/react-testing-library-third-party-test/enzyme-vs-testing-library.png">
 <meta property="article:published_time" content="2022-12-29T15:12:29.000Z">
-<meta property="article:modified_time" content="2022-12-29T16:02:53.454Z">
+<meta property="article:modified_time" content="2022-12-29T21:10:58.644Z">
 <meta property="article:author" content="Rhyno park">
 <meta property="article:tag" content="React Testing Library, Unit Test, Jest">
 <meta name="twitter:card" content="summary">
@@ -208,7 +208,10 @@ ga('send', 'pageview');
         <div class="article-entry" itemprop="articleBody">
             <p>Jest와 <a target="_blank" rel="noopener" href="https://testing-library.com/docs/react-testing-library/intro/">React Testing Library</a>를 사용하여 third-party 라이브러리 단위테스트의 어려움과 해결하는 사례를 공유한다.<br/></p>
 <p>개인적으로 최근까지 Vue기반 프론트엔드 개발을 하다가, 오랜만에 React를 사용하여 개발하고 있다. 예전에는 Enzyme를 사용하여 shallow render에서 단위 테스트를 진행했는데, 최근 React에는 Testing Libary를 사용하여 브라우저에서 동작하는 Full render 방식에서 단위 테스를 작성하는 것이 추세인 것 같다. (참고로, Enzyme은 글을 작성하는 현재 React 18을 지원하지 않고 있다.)<br><img src="/images/react-testing-library-third-party-test/enzyme-vs-testing-library.png" alt="React Testing Library"></p>
-<h2 id="1-게시글-등록-설명"><a href="#1-게시글-등록-설명" class="headerlink" title="1. 게시글 등록 설명"></a>1. 게시글 등록 설명</h2><p>앞서 Jodit Editor를 사용하여, 게시글을 등록하는 기능을 만들었는데, Jodit Editor를 감싼 Editor 컴포넌트를 만들었다.</p>
+<h2 id="1-게시글-등록-설명"><a href="#1-게시글-등록-설명" class="headerlink" title="1. 게시글 등록 설명"></a>1. 게시글 등록 설명</h2><ul>
+<li>연관글: <a href="https://gregor77.github.io/2022/12/26/jodit-editor-spiking/">React에서 Jodit Editor를 사용하여 게시판 만들기</a></li>
+</ul>
+<p>앞서 Jodit Editor를 사용하여, 게시글을 등록하는 기능을 만들었는데, Jodit Editor를 감싼 Editor 컴포넌트를 만들었다.</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># <span class="title class_">Editor</span>.<span class="property">js</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleChange</span> = (<span class="params">htmlContents</span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> plaintext = <span class="title class_">Jodit</span>.<span class="property">modules</span>.<span class="property">Helpers</span>.<span class="title function_">stripTags</span>(htmlContents);</span><br><span class="line">    <span class="title function_">onChange</span>(&#123;</span><br><span class="line">      htmlContents,</span><br><span class="line">      <span class="attr">plainContents</span>: plaintext,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">JoditEditor</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">ref</span>=<span class="string">&#123;editor&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">value</span>=<span class="string">&#123;content&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">config</span>=<span class="string">&#123;config&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">tabIndex</span>=<span class="string">&#123;1&#125;</span> // <span class="attr">tabIndex</span> <span class="attr">of</span> <span class="attr">textarea</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">onBlur</span>=<span class="string">&#123;(newContent)</span> =&gt;</span> setContent(newContent)&#125; // preferred to use only this option to update the content for performance reasons</span></span><br><span class="line"><span class="language-xml">      onChange=&#123;handleChange&#125;</span></span><br><span class="line"><span class="language-xml">    /&gt;</span></span><br><span class="line">  );</span><br></pre></td></tr></table></figure>
 
 <p>게시판 등록 페이지(NewArticle.js)에서는 Editor 컴포넌트를 사용하여, onChange 이벤트 핸들러 함수(handleChangeContents)에서 에디터에서 변경된 html과 plainHtml을 전달받아 state로 관리한다.<br/> 저장 버튼을 클릭하면, 게시글 제목과 에디터에서 등록된 htmlContents, plainContents 내용을 가지고 신규 게시글을 등록한다.</p>
@@ -333,7 +336,7 @@ ga('send', 'pageview');
         "url": "http://gregor77.github.io/2022/12/30/react-testing-library-third-party-test/",
         "description": "Jest와 React Testing Library를 사용하여 third-party 라이브러리 단위테스트의 어려움과 해결하는 사례를 공유한다.
 개인적으로 최근까지 Vue기반 프론트엔드 개발을 하다가, 오랜만에 React를 사용하여 개발하고 있다. 예전에는 Enzyme를 사용하여 shallow render에서 단위 테스트를 진행했는데, 최근 React에는 Te",
-        "wordCount": "1679",
+        "wordCount": "1686",
         "publisher": "Rhyno park",
         "mainEntityOfPage": {
             "@type": "WebPage",
