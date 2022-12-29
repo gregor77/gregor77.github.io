@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    
+
+    
+    <title>React Testing Library를 이용한 Third party library 단위 테스트 | Rhyno Tech Blog</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="React Testing Library, Unit Test, Jest" />
+    
+    <meta name="description" content="Jest와 React Testing Library를 사용하여 third-party 라이브러리 단위테스트의 어려움과 해결하는 사례를 공유한다. 개인적으로 최근까지 Vue기반 프론트엔드 개발을 하다가, 오랜만에 React를 사용하여 개발하고 있다. 예전에는 Enzyme를 사용하여 shallow render에서 단위 테스트를 진행했는데, 최근 React에는 Te">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React Testing Library를 이용한 Third party library 단위 테스트">
+<meta property="og:url" content="http://gregor77.github.io/2022/12/30/react-testing-library-third-party-test/index.html">
+<meta property="og:site_name" content="Rhyno Tech Blog">
+<meta property="og:description" content="Jest와 React Testing Library를 사용하여 third-party 라이브러리 단위테스트의 어려움과 해결하는 사례를 공유한다. 개인적으로 최근까지 Vue기반 프론트엔드 개발을 하다가, 오랜만에 React를 사용하여 개발하고 있다. 예전에는 Enzyme를 사용하여 shallow render에서 단위 테스트를 진행했는데, 최근 React에는 Te">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://gregor77.github.io/images/react-testing-library-third-party-test/enzyme-vs-testing-library.png">
+<meta property="article:published_time" content="2022-12-29T15:12:29.000Z">
+<meta property="article:modified_time" content="2022-12-29T16:02:53.454Z">
+<meta property="article:author" content="Rhyno park">
+<meta property="article:tag" content="React Testing Library, Unit Test, Jest">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://gregor77.github.io/images/react-testing-library-third-party-test/enzyme-vs-testing-library.png">
+    
+
+    
+
+    
+        <link rel="icon" href="/css/images/favicons/favicon.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/titillium-web/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.css">
+
+
+    
+<script src="/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-145306283-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/rss2.xml" title="Rhyno Tech Blog" type="application/rss+xml">
+</head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/" class="logo">Rhyno Tech Blog</a>
+                    </h1>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/">Home</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Blog/">Blog</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Docker/">Docker</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/ElasticSearch/">ElasticSearch</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/React-FE/">React, FE</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Review/">Review</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Spring-security/">Spring security</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><ul class="main-nav-list-child"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a></li></ul></li></ul>
+                                    
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/categories/React-FE/">React, FE</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-react-testing-library-third-party-test" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        React Testing Library를 이용한 Third party library 단위 테스트
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/2022/12/30/react-testing-library-third-party-test/" class="article-date">
+            <time datetime="2022-12-29T15:12:29.000Z" itemprop="datePublished">2022-12-30</time>
+        </a>
+    </div>
+
+		        
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/React-Testing-Library-Unit-Test-Jest/" rel="tag">React Testing Library, Unit Test, Jest</a>
+    </div>
+
+            </div>
+        
+<!--        <div class="article-pv">-->
+<!--            <span class="sns-icon fa-eye">-->
+<!--                0-->
+<!--            </span>-->
+<!--        </div>-->
+        
+        <div class="article-entry" itemprop="articleBody">
+            <p>Jest와 <a target="_blank" rel="noopener" href="https://testing-library.com/docs/react-testing-library/intro/">React Testing Library</a>를 사용하여 third-party 라이브러리 단위테스트의 어려움과 해결하는 사례를 공유한다.<br/></p>
+<p>개인적으로 최근까지 Vue기반 프론트엔드 개발을 하다가, 오랜만에 React를 사용하여 개발하고 있다. 예전에는 Enzyme를 사용하여 shallow render에서 단위 테스트를 진행했는데, 최근 React에는 Testing Libary를 사용하여 브라우저에서 동작하는 Full render 방식에서 단위 테스를 작성하는 것이 추세인 것 같다. (참고로, Enzyme은 글을 작성하는 현재 React 18을 지원하지 않고 있다.)<br><img src="/images/react-testing-library-third-party-test/enzyme-vs-testing-library.png" alt="React Testing Library"></p>
+<h2 id="1-게시글-등록-설명"><a href="#1-게시글-등록-설명" class="headerlink" title="1. 게시글 등록 설명"></a>1. 게시글 등록 설명</h2><p>앞서 Jodit Editor를 사용하여, 게시글을 등록하는 기능을 만들었는데, Jodit Editor를 감싼 Editor 컴포넌트를 만들었다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># <span class="title class_">Editor</span>.<span class="property">js</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleChange</span> = (<span class="params">htmlContents</span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> plaintext = <span class="title class_">Jodit</span>.<span class="property">modules</span>.<span class="property">Helpers</span>.<span class="title function_">stripTags</span>(htmlContents);</span><br><span class="line">    <span class="title function_">onChange</span>(&#123;</span><br><span class="line">      htmlContents,</span><br><span class="line">      <span class="attr">plainContents</span>: plaintext,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">JoditEditor</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">ref</span>=<span class="string">&#123;editor&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">value</span>=<span class="string">&#123;content&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">config</span>=<span class="string">&#123;config&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">tabIndex</span>=<span class="string">&#123;1&#125;</span> // <span class="attr">tabIndex</span> <span class="attr">of</span> <span class="attr">textarea</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">onBlur</span>=<span class="string">&#123;(newContent)</span> =&gt;</span> setContent(newContent)&#125; // preferred to use only this option to update the content for performance reasons</span></span><br><span class="line"><span class="language-xml">      onChange=&#123;handleChange&#125;</span></span><br><span class="line"><span class="language-xml">    /&gt;</span></span><br><span class="line">  );</span><br></pre></td></tr></table></figure>
+
+<p>게시판 등록 페이지(NewArticle.js)에서는 Editor 컴포넌트를 사용하여, onChange 이벤트 핸들러 함수(handleChangeContents)에서 에디터에서 변경된 html과 plainHtml을 전달받아 state로 관리한다.<br/> 저장 버튼을 클릭하면, 게시글 제목과 에디터에서 등록된 htmlContents, plainContents 내용을 가지고 신규 게시글을 등록한다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"># <span class="title class_">NewArticle</span>.<span class="property">js</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">function</span> <span class="title function_">NewArticle</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [contents, setContents] = <span class="title function_">useState</span>(&#123;</span><br><span class="line">    <span class="attr">htmlContents</span>: <span class="string">&#x27;내용을 입력하세요.&#x27;</span>,</span><br><span class="line">    <span class="attr">plainContents</span>: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">  &#125;);</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">handleChangeContents</span> = (<span class="params">contents</span>) =&gt; &#123;</span><br><span class="line">    <span class="title function_">setContents</span>(&#123; ...contents &#125;);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">addNewArticle</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; htmlContents, plainContents &#125; = contents;</span><br><span class="line">    <span class="keyword">await</span> bulletinBoardApi.<span class="title function_">addArticle</span>(title, htmlContents, plainContents);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">PageContainer</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">TitleContainer</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">Title</span>&gt;</span>게시글 추가<span class="tag">&lt;/<span class="name">Title</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">TitleContainer</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;new-article--container&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;new-article--editor-wrapper&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">Editor</span> <span class="attr">html</span>=<span class="string">&#123;contents.htmlContents&#125;</span> <span class="attr">onChange</span>=<span class="string">&#123;handleChangeContents&#125;</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">ButtonGroupWrapper</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">Button</span> <span class="attr">variant</span>=<span class="string">&quot;outlined&quot;</span> <span class="attr">onClick</span>=<span class="string">&#123;moveBack&#125;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">            취소</span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;/<span class="name">Button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">Button</span> <span class="attr">variant</span>=<span class="string">&quot;contained&quot;</span> <span class="attr">onClick</span>=<span class="string">&#123;addNewArticle&#125;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">            저장</span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;/<span class="name">Button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;/<span class="name">ButtonGroupWrapper</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">PageContainer</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-Third-pary-라이브러리의-Full-render에서-테스트-어려움"><a href="#2-Third-pary-라이브러리의-Full-render에서-테스트-어려움" class="headerlink" title="2. Third-pary 라이브러리의 Full render에서 테스트 어려움"></a>2. Third-pary 라이브러리의 Full render에서 테스트 어려움</h2><p>Jodit Editor의 onChange 이벤트를 실행하기 위해서, 내부적으로 Jodit Editor가 동작하는 방식을 확인해야 한다. Shallow render 방식에서는 Editor 컴포넌트를 찾고, 이벤트를 실행하면 간단하지만 <strong>Full render 방식에서는 Jodit editor가 어떻게 render되고, 그 안에서 onChange 이벤트를 실행하기 위한 동작 확인이 필요하다.</strong> (단순히 <code>&lt;p&gt;</code> 태그를 찾아서 innerHtml에 컨텐츠를 수정하는 방식으로는 onChange 이벤트가 실행되지 않았다.)<br/></p>
+<p>Jodit Editor에서 onChange 이벤트를 실행해야만 NewArticle 페이지에서 컨텐츠 내용을 세팅할 수 있는데, <strong>테스트를 작성하려는 대상인 SUT(System Under Test)에 집중해야 하는데 테스트 대상보다는 내부에 의존하고 있는 Third-party 라이브러리 분석에 시간이 오래 걸리는 상황이 단위 테스트 작성하기 어렵게 만들었다.</strong> </p>
+<p>이런 문제를 해결하기 위해서 테스트 하기 쉬운 방법을 찾아야만 했다.</p>
+<ul>
+<li><strong>Full render에서 Editor 컴포넌트 Mocking</strong><ul>
+<li>Testing Library는 그대로 사용</li>
+<li>Jodit Editor를 감싼 Editor.js 컴포넌트를 Jest를 사용하여 Mocking 하기</li>
+</ul>
+</li>
+<li>Shallow render 방식에서 테스트 작성<ul>
+<li>Enzyme은 React 18 미지원</li>
+<li><a target="_blank" rel="noopener" href="https://ko.reactjs.org/docs/shallow-renderer.html">‘react-test-renderer&#x2F;shallow’ 모듈을 사용한 shallow render</a></li>
+</ul>
+</li>
+</ul>
+<p>Third-party 라이브러리르 사용하고 있는 컴포넌트 Mocking을 통해서 문제를 쉽게 해결할 수 있다. 따라서 Shallow render 방식으로 테스트 방식을 바꾸지 않고, Full render 방식의 테스트 일관성을 유지할 수 있다.</p>
+<h2 id="3-테스트용-간접-컴포넌트-생성-및-Mocking을-통한-해결"><a href="#3-테스트용-간접-컴포넌트-생성-및-Mocking을-통한-해결" class="headerlink" title="3. 테스트용 간접 컴포넌트 생성 및 Mocking을 통한 해결"></a>3. 테스트용 간접 컴포넌트 생성 및 Mocking을 통한 해결</h2><p>Editor.js 컴포넌트 대신에 단위 테스트용 간접 컴포넌트를 생성하여, Jest의 모듈 mocking 방식을 이용하여 Third-party 라이브러리의 내부 파악에 시간을 크게 들이지 않고, 쉽게 테스트 작성이 가능하다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># <span class="title class_">NewArticle</span>.<span class="property">test</span>.<span class="property">js</span></span><br><span class="line"></span><br><span class="line">jest.<span class="title function_">mock</span>(<span class="string">&#x27;@/components/editor/Editor&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// eslint-disable-next-line react/display-name</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">&#123; html, onChange &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">handleChange</span> = (<span class="params">e</span>) =&gt; &#123;</span><br><span class="line">      <span class="keyword">const</span> htmlContents = e.<span class="property">target</span>?.<span class="property">value</span>;</span><br><span class="line">      <span class="title function_">onChange</span>(&#123;</span><br><span class="line">        htmlContents,</span><br><span class="line">        <span class="attr">plainContents</span>: <span class="variable constant_">NEW_PLAIN_CONTENTS</span>,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> <span class="language-xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">data-testid</span>=<span class="string">&quot;editor&quot;</span> <span class="attr">value</span>=<span class="string">&#123;html&#125;</span> <span class="attr">onChange</span>=<span class="string">&#123;handleChange&#125;</span> /&gt;</span></span>;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[참고] jest.<span class="property">mock</span> 함수</span><br><span class="line">jest.<span class="title function_">mock</span>(<span class="string">&#x27;모듈명&#x27;</span>, factory 함수)</span><br><span class="line">- factory 함수 내부에서 테스트 목적의 함수형 컴포넌트를 리턴하게끔 한다.</span><br></pre></td></tr></table></figure>
+<p><strong>NewArticle.js 페이지 내부에서 Editor 컴포넌트를 사용하는데 jest.mock 함수를 사용하여 Editor 컴포넌트 대신에 테스트용 간접 컴포넌트를 사용하게끔 mocking이 가능하다.</strong> </p>
+<p>또한 간접 컴포넌트에서 data-testid&#x3D;”editor” 값을 지정했기 때문에, screen.getByTestId(‘editor’)을 통해서 쉽게 가상 dom element를 접근이 가능하다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"># <span class="title class_">NewArticle</span>.<span class="property">test</span>.<span class="property">js</span></span><br><span class="line"></span><br><span class="line">jest.<span class="title function_">mock</span>(<span class="string">&#x27;@/components/editor/Editor&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// eslint-disable-next-line react/display-name</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">&#123; html, onChange &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">handleChange</span> = (<span class="params">e</span>) =&gt; &#123;</span><br><span class="line">      <span class="keyword">const</span> htmlContents = e.<span class="property">target</span>?.<span class="property">value</span>;</span><br><span class="line">      <span class="title function_">onChange</span>(&#123;</span><br><span class="line">        htmlContents,</span><br><span class="line">        <span class="attr">plainContents</span>: <span class="variable constant_">NEW_PLAIN_CONTENTS</span>,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> <span class="language-xml"><span class="tag">&lt;<span class="name">input</span> <span class="attr">data-testid</span>=<span class="string">&quot;editor&quot;</span> <span class="attr">value</span>=<span class="string">&#123;html&#125;</span> <span class="attr">onChange</span>=<span class="string">&#123;handleChange&#125;</span> /&gt;</span></span>;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;NewArticle&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">beforeEach</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">render</span>(</span><br><span class="line">      <span class="language-xml"><span class="tag">&lt;<span class="name">RecoilRoot</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">NewArticle</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">RecoilRoot</span>&gt;</span></span></span><br><span class="line">    );</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="title function_">describe</span>(<span class="string">&#x27;add newArticle&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">updateContents</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">      <span class="keyword">const</span> editor = screen.<span class="title function_">getByTestId</span>(<span class="string">&#x27;editor&#x27;</span>);</span><br><span class="line">      <span class="keyword">await</span> fireEvent.<span class="title function_">change</span>(editor, &#123;</span><br><span class="line">        <span class="attr">target</span>: &#123;</span><br><span class="line">          <span class="attr">value</span>: <span class="variable constant_">NEW_HTML_CONTENTS</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">beforeEach</span>(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">      bulletinBoardApi.<span class="property">addArticle</span>.<span class="title function_">mockResolvedValue</span>();</span><br><span class="line">      <span class="keyword">await</span> <span class="title function_">updateContents</span>();</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> saveButton = screen.<span class="title function_">getByText</span>(<span class="string">&#x27;저장&#x27;</span>);</span><br><span class="line">      fireEvent.<span class="title function_">click</span>(saveButton);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="title function_">it</span>(<span class="string">&#x27;should add new article&#x27;</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">      <span class="title function_">expect</span>(bulletinBoardApi.<span class="property">addArticle</span>).<span class="title function_">toBeCalledWith</span>(<span class="variable constant_">NEW_TITLE</span>, <span class="variable constant_">NEW_HTML_CONTENTS</span>, <span class="variable constant_">NEW_PLAIN_CONTENTS</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="마무리"><a href="#마무리" class="headerlink" title="마무리"></a>마무리</h2><p>다른 화면에서 Editor 컴포넌트를 사용하는 경우에는 테스트용 간접 컴포넌트를 선언하고 Mocking 하는 방식을 개발자들이 반복해야 할 수 있다. <br/><br><strong>이런 문제를 해결하기 위해서 1) 테스트용 컴포넌트를 별도로 관리하고 2) 모듈 mocking하는 선언을 setupTest.js으로 이동하여 테스트 전체에 일괄로 적용한다.</strong></p>
+<p>이렇게 <strong>필요할 때마다 테스트용 간접 컴포넌트를 만들고, 글로벌 선언하는 방식을 차곡차곡 반복하면서, 케이스들이 쌓일 수록 개발자들은 단위 테스트 작성하기가 쉽고, 유지보수 하기 쉬운 테스트를 작성할 수 있다.</strong></p>
+<h2 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/61632377/how-to-test-third-party-components-library-in-react-testing-library">How to test third-party components library in react-testing-library</a></li>
+<li><a target="_blank" rel="noopener" href="https://reactjs.org/docs/shallow-renderer.html">React Shallow render Test</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/jodit/jodit-react/blob/master/src/JoditEditor.js">Jodit Editor Github 소스</a></li>
+<li><a target="_blank" rel="noopener" href="https://testing-library.com/docs/queries/byrole">testing libary - getByRole</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/textbox_role">ARIA roles - getByRole 활용</a></li>
+<li><a target="_blank" rel="noopener" href="https://toss.tech/article/node-modules-and-yarn-berry">Yarn berry 빌드 개선</a></li>
+</ul>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="http://gregor77.github.io/2022/12/30/react-testing-library-third-party-test/" data-id="clc99zvjb0000zcw41a152w6u" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "Rhyno park"
+        },
+        "headline": "React Testing Library를 이용한 Third party library 단위 테스트",
+        "image": "http://gregor77.github.io/images/react-testing-library-third-party-test/enzyme-vs-testing-library.png",
+        "keywords": "React Testing Library, Unit Test, Jest",
+        "genre": "React, FE",
+        "datePublished": "2022-12-30",
+        "dateCreated": "2022-12-30",
+        "dateModified": "2022-12-30",
+        "url": "http://gregor77.github.io/2022/12/30/react-testing-library-third-party-test/",
+        "description": "Jest와 React Testing Library를 사용하여 third-party 라이브러리 단위테스트의 어려움과 해결하는 사례를 공유한다.
+개인적으로 최근까지 Vue기반 프론트엔드 개발을 하다가, 오랜만에 React를 사용하여 개발하고 있다. 예전에는 Enzyme를 사용하여 shallow render에서 단위 테스트를 진행했는데, 최근 React에는 Te",
+        "wordCount": "1679",
+        "publisher": "Rhyno park",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http://gregor77.github.io/2022/12/30/react-testing-library-third-party-test/"
+        }
+    }
+</script>
+
+</article>
+
+    <section id="comments">
+    
+        
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
+    
+    </section>
+
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>follow:</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="linkedin" href="https://linkedin.com/in/sungjin-park-376314103/" target="_blank" rel="noopener">
+                        <i class="icon fa fa-linkedin"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/gregor77?tab=repositories" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2022/12/28/elasticsearch_index_shard/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">older</strong>
+        <p class="article-nav-title">ElasticSearch - 인덱스</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">recents</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/30/react-testing-library-third-party-test/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/react-testing-library-third-party-test/enzyme-vs-testing-library.png)" alt="React Testing Library를 이용한 Third party library 단위 테스트" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/React-FE/">React, FE</a></p>
+                            <p class="item-title"><a href="/2022/12/30/react-testing-library-third-party-test/" class="title">React Testing Library를 이용한 Third party library 단위 테스트</a></p>
+                            <p class="item-date"><time datetime="2022-12-29T15:12:29.000Z" itemprop="datePublished">2022-12-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/28/elasticsearch_index_shard/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/ElasticSearch/">ElasticSearch</a></p>
+                            <p class="item-title"><a href="/2022/12/28/elasticsearch_index_shard/" class="title">ElasticSearch - 인덱스</a></p>
+                            <p class="item-date"><time datetime="2022-12-27T15:12:29.000Z" itemprop="datePublished">2022-12-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2022/12/26/jodit-editor-spiking/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/jodit-editor/editor-image.png)" alt="React에서 Jodit Editor를 사용하여 게시판 만들기" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/React-FE/">React, FE</a></p>
+                            <p class="item-title"><a href="/2022/12/26/jodit-editor-spiking/" class="title">React에서 Jodit Editor를 사용하여 게시판 만들기</a></p>
+                            <p class="item-date"><time datetime="2022-12-26T06:07:42.000Z" itemprop="datePublished">2022-12-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/book-review-infra-engineer-book/인프라엔지니어의교과서.PNG)" alt="서평 - 인프라 엔지니어의 교과서" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Review/">Review</a></p>
+                            <p class="item-title"><a href="/2021/06/11/book-review-%EC%9D%B8%ED%94%84%EB%9D%BC%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98%EA%B5%90%EA%B3%BC%EC%84%9C/" class="title">서평 - 인프라 엔지니어의 교과서</a></p>
+                            <p class="item-date"><time datetime="2021-06-11T00:39:56.000Z" itemprop="datePublished">2021-06-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/05/18/spring-security-03/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/images/spring-security/03/spring-security-authentication-architecture-provider.png)" alt="Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-security/">Spring security</a></p>
+                            <p class="item-title"><a href="/2021/05/18/spring-security-03/" class="title">Spring Security - 3. 인증 절차를 정의하는 AuthenticationProvider</a></p>
+                            <p class="item-date"><time datetime="2021-05-18T06:37:17.000Z" itemprop="datePublished">2021-05-18</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Docker/">Docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ElasticSearch/">ElasticSearch</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/React-FE/">React, FE</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-security/">Spring security</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/">Unit Test & TDD</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Unit-Test-TDD/Spring/">Spring</a><span class="category-list-count">1</span></li></ul></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Authentication/" style="font-size: 20px;">Authentication</a> <a href="/tags/AuthenticationManager/" style="font-size: 10px;">AuthenticationManager</a> <a href="/tags/AuthenticationProvider/" style="font-size: 10px;">AuthenticationProvider</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C-%EC%96%B8%EC%96%B4/" style="font-size: 10px;">C 언어</a> <a href="/tags/Controller-Test/" style="font-size: 10px;">Controller Test</a> <a href="/tags/CountDownLatch/" style="font-size: 10px;">CountDownLatch</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Docker-%EC%8B%A4%EC%8A%B5/" style="font-size: 10px;">Docker 실습</a> <a href="/tags/ElasticSearch-%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84/" style="font-size: 10px;">ElasticSearch, 검색엔진</a> <a href="/tags/Github-blog/" style="font-size: 10px;">Github blog</a> <a href="/tags/Google-Analytics/" style="font-size: 10px;">Google Analytics</a> <a href="/tags/Google-Search-Console/" style="font-size: 20px;">Google Search Console</a> <a href="/tags/GrantedAuthority/" style="font-size: 10px;">GrantedAuthority</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Hybrid-Test/" style="font-size: 10px;">Hybrid Test</a> <a href="/tags/JSON-LD/" style="font-size: 10px;">JSON-LD</a> <a href="/tags/Jodit-Editor/" style="font-size: 10px;">Jodit, Editor</a> <a href="/tags/Multi-Thread/" style="font-size: 10px;">Multi Thread</a> <a href="/tags/Privilege/" style="font-size: 10px;">Privilege</a> <a href="/tags/ProviderManager/" style="font-size: 10px;">ProviderManager</a> <a href="/tags/React-Testing-Library-Unit-Test-Jest/" style="font-size: 10px;">React Testing Library, Unit Test, Jest</a> <a href="/tags/Role/" style="font-size: 10px;">Role</a> <a href="/tags/SEO/" style="font-size: 20px;">SEO</a> <a href="/tags/SW-Engineering/" style="font-size: 20px;">SW Engineering</a> <a href="/tags/Schema-org/" style="font-size: 10px;">Schema.org</a> <a href="/tags/SecurityContextHolder/" style="font-size: 10px;">SecurityContextHolder</a> <a href="/tags/Semantic-Web/" style="font-size: 10px;">Semantic Web</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Security/" style="font-size: 20px;">Spring Security</a> <a href="/tags/Spring-security/" style="font-size: 10px;">Spring security</a> <a href="/tags/TDD/" style="font-size: 20px;">TDD</a> <a href="/tags/Unit-Test/" style="font-size: 10px;">Unit Test</a> <a href="/tags/Unit-Test-Anti-Pattern/" style="font-size: 10px;">Unit Test Anti Pattern</a> <a href="/tags/Unit-test/" style="font-size: 20px;">Unit test</a> <a href="/tags/UserDetailsService/" style="font-size: 10px;">UserDetailsService</a> <a href="/tags/structure-data/" style="font-size: 10px;">structure data</a> <a href="/tags/%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84%EC%B5%9C%EC%A0%81%ED%99%94/" style="font-size: 10px;">검색엔진최적화</a> <a href="/tags/%EA%B5%AC%EC%A1%B0%ED%99%94%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0/" style="font-size: 10px;">구조화된 데이터</a> <a href="/tags/%EA%B8%B8%EB%B2%97/" style="font-size: 10px;">길벗</a> <a href="/tags/%EB%8B%A8%EC%9C%84-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%A4%ED%8C%A8/" style="font-size: 10px;">단위 테스트 실패</a> <a href="/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/" style="font-size: 20px;">단위테스트</a> <a href="/tags/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D%EA%B3%BC-%EC%84%A4%EA%B3%84/" style="font-size: 10px;">요구사항 분석과 설계</a> <a href="/tags/%EC%9D%B8%EC%A6%9D-%EC%A0%88%EC%B0%A8/" style="font-size: 10px;">인증 절차</a> <a href="/tags/%EC%9D%B8%ED%94%84%EB%9D%BC-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EC%9D%98-%EA%B5%90%EA%B3%BC%EC%84%9C/" style="font-size: 10px;">인프라 엔지니어의 교과서</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://github.com/gregor77?tab=repositories">Rhyno Git Repository</a>
+                    </li>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/sung-jin-park-376314103">Rhyno LinkedIn</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/" class="logo"></a>
+                </h1>
+                <p>&copy; 2022 Rhyno park</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+        
+    
+    <script>
+    var disqus_shortname = 'hexo-theme-hueman';
+    
+    
+    var disqus_url = 'http://gregor77.github.io/2022/12/30/react-testing-library-third-party-test/';
+    
+    (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
