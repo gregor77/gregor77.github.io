@@ -39,32 +39,6 @@
     </item>
     
     <item>
-      <title>ElasticSearch - 인덱스</title>
-      <link>http://gregor77.github.io/2022/12/28/elasticsearch_index_shard/</link>
-      <guid>http://gregor77.github.io/2022/12/28/elasticsearch_index_shard/</guid>
-      <pubDate>Tue, 27 Dec 2022 15:12:29 GMT</pubDate>
-      
-        
-        
-      <description>&lt;h2 id=&quot;엘라스틱서치와-RDBMS-비교&quot;&gt;&lt;a href=&quot;#엘라스틱서치와-RDBMS-비교&quot; class=&quot;headerlink&quot; title=&quot;엘라스틱서치와 RDBMS 비교&quot;&gt;&lt;/a&gt;엘라스틱서치와 RDBMS 비교&lt;/h2&gt;&lt;p&gt;엘라스틱서치와 RDBMS에</description>
-        
-      
-      
-      
-      <content:encoded><![CDATA[<h2 id="엘라스틱서치와-RDBMS-비교"><a href="#엘라스틱서치와-RDBMS-비교" class="headerlink" title="엘라스틱서치와 RDBMS 비교"></a>엘라스틱서치와 RDBMS 비교</h2><p>엘라스틱서치와 RDBMS에서 역할 비교를 통해서 의미를 파악한다.</p><table><thead><tr><th>ElasticSearch</th><th>RDBMS</th></tr></thead><tbody><tr><td>index</td><td>database</td></tr><tr><td>mapping</td><td>schema</td></tr><tr><td>document</td><td>row</td></tr></tbody></table><h2 id="인덱스-index"><a href="#인덱스-index" class="headerlink" title="인덱스 (index)"></a>인덱스 (index)</h2><ul><li>문서가 저장되는 논리적인 공간</li><li>인덱스 설계가 첫단계 (예. 로그, 검색엔진)</li></ul><h4 id="인덱스-설계-방법"><a href="#인덱스-설계-방법" class="headerlink" title="인덱스 설계 방법"></a>인덱스 설계 방법</h4><p>인덱스 설계에 따라 문서의 구조 및 쿼리가 달라진다.<br><strong>하나의 인덱스로 시작해서, 사용자 패턴에 따라 점진적으로 확장해나간다.</strong></p><ul><li>하나의 인덱스 사용<ul><li>관리해야 할 인덱스 수가 적어 관리가 쉽다.</li><li>쿼리, 문서 구조가 복잡성이 올라간다.</li></ul></li><li>업무적으로 작은 단위로도 여러 개의 인덱스로 나눌때<ul><li>최적화된 쿼리, 문서 구조 사용 가능</li><li>관리해야하는 인덱스가 많아지므로, 관리에 많은 비용이 든다.</li></ul></li></ul><h2 id="샤드-shard"><a href="#샤드-shard" class="headerlink" title="샤드 (shard)"></a>샤드 (shard)</h2><ul><li>인덱스에 색인되는 문자가 저장되는 공간</li></ul><h4 id="샤드-종류"><a href="#샤드-종류" class="headerlink" title="샤드 종류"></a>샤드 종류</h4><ul><li>Primary Shard<ul><li>문서가 저장되는 원본 샤드, <strong>색인과 검색 성능에 영향</strong></li></ul></li><li>Replica Shard<ul><li>프라이머리 샤드에 복제 샤드, <strong>검색 성능에 영향</strong></li><li>프라이머리 샤드 문제시, Replica Shard가 Primary Shard로 승격</li></ul></li></ul><h4 id="샤드-설정"><a href="#샤드-설정" class="headerlink" title="샤드 설정"></a>샤드 설정</h4><ul><li>Primary Shard : 5개</li><li>Replica Shard &#x3D; number_of_shard * number_of_replicats &#x3D; 5 * 2 &#x3D; 10개</li><li>Total Shard : 5 + 10 &#x3D; 15개<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PUT /library/_settings</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  &quot;index&quot;: &#123;</span><br><span class="line">    &quot;number_of_shards&quot; : 5,</span><br><span class="line">    &quot;number_of_replicas&quot;: 2</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul><h4 id="샤드-라우팅"><a href="#샤드-라우팅" class="headerlink" title="샤드 라우팅"></a>샤드 라우팅</h4><p>문서 저장되는 방법으로 샤드의 개수가 바뀌면, 문서가 저장되는 규칙이 완전히 바뀐다.</p><ul><li>Routing Rule &#x3D; (문서의 ID) % (샤드의 갯수)</li><li><strong>인덱스 생성 시, 프라이머리 샤드의 갯수를 설정하는 것이 중요하다. 왜냐면 인덱스 생성 이후, 프라이머리 샤드 개수는 변경 불가하다.</strong></li><li>number_of_shards의 기본값 1로, 이 기본값을 그대로 사용하면 성능 문제가 발생한다.</li></ul><h4 id="인덱스-템플릿"><a href="#인덱스-템플릿" class="headerlink" title="인덱스 템플릿"></a>인덱스 템플릿</h4><p>인덱스 템플릿을 통해 인덱스 생성 시의 샤드 개수를 미리 설정이 가능하다.</p><ul><li>프라이머리 : 5, 레플리카 : 10, 총 15개<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">PUT _index_template// base_template</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  &quot;index_pattern&quot;: [&quot;nginx-log-*&quot;],</span><br><span class="line">  &quot;template&quot;: &#123;</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;number_of_shards&quot; : 5,</span><br><span class="line">    &quot;number_of_replicas&quot;: 2</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul>]]></content:encoded>
-      
-      
-      <category domain="http://gregor77.github.io/categories/ElasticSearch/">ElasticSearch</category>
-      
-      
-      <category domain="http://gregor77.github.io/tags/ElasticSearch-%EA%B2%80%EC%83%89%EC%97%94%EC%A7%84/">ElasticSearch, 검색엔진</category>
-      
-      
-      <comments>http://gregor77.github.io/2022/12/28/elasticsearch_index_shard/#disqus_thread</comments>
-      
-    </item>
-    
-    <item>
       <title>React에서 Jodit Editor를 사용하여 게시판 만들기</title>
       <link>http://gregor77.github.io/2022/12/26/jodit-editor-spiking/</link>
       <guid>http://gregor77.github.io/2022/12/26/jodit-editor-spiking/</guid>
