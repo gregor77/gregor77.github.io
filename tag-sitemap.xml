@@ -3,6 +3,13 @@
 
 
     <url>
+        <loc>http://gregor77.github.io/tags/Unit-test/</loc>
+        <lastmod>2022-12-29T22:51:30.035Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>http://gregor77.github.io/tags/React-Testing-Library-Unit-Test-Jest/</loc>
         <lastmod>2022-12-29T21:10:58.644Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -284,13 +291,6 @@
 
     <url>
         <loc>http://gregor77.github.io/tags/%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8/</loc>
-        <lastmod>2022-12-26T06:02:24.385Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://gregor77.github.io/tags/Unit-test/</loc>
         <lastmod>2022-12-26T06:02:24.385Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>

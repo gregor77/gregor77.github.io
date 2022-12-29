@@ -9,6 +9,14 @@
 
 
     <url>
+        <loc>http://gregor77.github.io/2022/12/30/unit-test-frontend/</loc>
+        <lastmod>2022-12-29T22:51:30.035Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://gregor77.github.io/2022/12/30/react-testing-library-third-party-test/</loc>
         <lastmod>2022-12-29T21:10:58.644Z</lastmod>
         <changefreq>weekly</changefreq>
