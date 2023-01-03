@@ -3,8 +3,15 @@
 
 
     <url>
+        <loc>http://gregor77.github.io/tags/react-%EC%84%B1%EB%8A%A5-%EC%B5%9C%EC%A0%81%ED%99%94-memo-useMemo-useCallback/</loc>
+        <lastmod>2023-01-03T07:45:39.024Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>http://gregor77.github.io/tags/Unit-test/</loc>
-        <lastmod>2022-12-29T22:56:38.788Z</lastmod>
+        <lastmod>2023-01-02T08:46:20.413Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
