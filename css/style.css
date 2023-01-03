@@ -2,7 +2,6 @@
 #main .main-body-header a,
 .article-meta,
 .archive-year {
-  text-transform: uppercase;
   color: #666;
   line-height: 1em;
   text-shadow: 0 1px #fff;
@@ -230,7 +229,7 @@ body,
 }
 body {
   background: #eaeaea;
-  font: 14px "Titillium Web", "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
+  font: 14px 'Noto Sans', sans-serif;
   -webkit-text-size-adjust: 100%;
 }
 code {
@@ -319,7 +318,6 @@ code {
   color: #666;
   font-size: 16px;
   font-weight: 600;
-  text-transform: uppercase;
   line-height: 24px;
 }
 #main .main-body-header .page-title-link,
@@ -531,7 +529,7 @@ code {
   -moz-transition: 0.2s ease-in;
   -ms-transition: 0.2s ease-in;
   transition: 0.2s ease-in;
-  font: 16px "Titillium Web", "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
+  font: 16px 'Noto Sans', sans-serif;
   color: rgba(255,255,255,0.7);
 }
 .search-form-input:focus,
@@ -586,7 +584,6 @@ code {
   color: rgba(255,255,255,0.8);
   font-size: 16px;
   font-weight: 600;
-  text-transform: uppercase;
   line-height: 24px;
   padding: 3px 0;
 }
@@ -619,7 +616,6 @@ code {
   border-radius: 3px;
   -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.2);
   box-shadow: 0 0 2px rgba(0,0,0,0.2);
-  text-transform: uppercase;
   z-index: 1;
 }
 #sidebar .sidebar-top .social-links .social-tooltip:hover:before {
@@ -690,7 +686,6 @@ code {
   letter-spacing: 0.5px;
   line-height: 24px;
   font-weight: normal;
-  text-transform: uppercase;
 }
 .article-nav-title {
   font-size: 15px;
@@ -702,7 +697,6 @@ code {
 .widget-title {
   font-size: 15px;
   font-weight: 400;
-  text-transform: uppercase;
   margin-bottom: 6px;
 }
 .widget {
@@ -849,7 +843,6 @@ code {
 #recent-post li .item-inner a,
 #recent-post li .item-inner .item-category {
   font-size: 13px;
-  text-transform: uppercase;
 }
 #recent-post li .item-inner a a,
 #recent-post li .item-inner .item-category a {
@@ -878,7 +871,6 @@ code {
 #recent-post li .item-inner .item-date {
   color: #aaa;
   font-size: 13px;
-  text-transform: uppercase;
 }
 #recent-post li:hover .item-thumbnail {
   opacity: 0.8;
@@ -1078,9 +1070,6 @@ a.article-title:hover {
 .article-meta a:hover {
   color: color-link;
 }
-.article-meta .category {
-  text-transform: uppercase;
-}
 .article-meta .category a,
 .article-meta .category i {
   margin-left: 0;
@@ -1119,7 +1108,7 @@ a.article-title:hover {
 }
 .article-entry {
   color: #555;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 300;
   line-height: 1.6em;
 }
@@ -1221,7 +1210,7 @@ a.article-title:hover {
 .article-entry blockquote footer {
   font-size: 14px;
   margin: 1.6em 0;
-  font-family: "Titillium Web", "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
+  font-family: 'Noto Sans', sans-serif;
 }
 .article-entry blockquote footer cite:before {
   content: "—";
@@ -1333,7 +1322,7 @@ a.article-title:hover {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  font: 14px "Titillium Web", "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
+  font: 14px 'Noto Sans', sans-serif;
   padding: 0 15px;
   color: #555;
   outline: none;
